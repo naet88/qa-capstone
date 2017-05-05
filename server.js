@@ -18,7 +18,7 @@ app.get('/questions', (req, res) => {
 		.exec()
 		.then(questions => {
 			res.json({
-				questions: questions
+				questions: questions.map(question => {return question.apiRepr();})
 			})
 		})
 
@@ -62,7 +62,8 @@ app.post('/questions', (req, res) => {
 });
 
 app.put('/questions/:id', (req, res) => {
-	//assuming ids match for now 
+	//assuming ids match for now
+	//force minimum word count  
 	const userAnswer = req.body.answer;
 
 	Question

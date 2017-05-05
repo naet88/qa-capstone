@@ -6,11 +6,14 @@ const questionSchema = mongoose.Schema({
 	questionTitle: {type: String, required: true},
 	username: {type: String, required: true},
 	questionDetail: {type: String, required: true},
-	answer: {
-		content: {type: Array},
-		likeCount: {type: Number}
-	}
+	answers: [{
+		content: {type: String},
+		likeCount: {type: Number},
+		username: {type: String}
+	}]
 });
+
+
 
 questionSchema.methods.apiRepr = function() {
 	return {
@@ -18,10 +21,7 @@ questionSchema.methods.apiRepr = function() {
 		questionTitle: this.questionTitle,
 		username: this.username,
 		questionDetail: this.questionDetail,
-		answer: {
-			content: this.answer.content,
-			likeCount: this.answer.likeCount
-		}
+		answers: this.answers
 	};
 }
 
