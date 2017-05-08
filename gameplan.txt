@@ -1,0 +1,42 @@
+//
+//Ask Question Page// 
+//
+
+User types:
+question title
+question detail
+
+User clicks submit
+--> jquery event listener
+
+Username is collected 
+--> somehow...
+
+DB is updated
+--> somehow...
+
+User redirected to new page that shows her question 
+--> domain.com/question-title
+
+//
+//Home Page//
+//
+
+Visually similar to stackoverflow.com
+
+List of all questions (GET REQUEST)
+
+- Q title (clickable)
+- 0 answers
+- 0 likes 
+
+//
+//Question-Answer Page//
+//
+
+domain.com/question-title (GET REQUEST)
+
+- question title
+- question content
+- username
+- potential answers

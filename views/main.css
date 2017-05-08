@@ -1,0 +1,61 @@
+body * {
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+a {
+  text-decoration: none;
+}
+
+.top-nav {
+	background-color: #D3D3D3;
+	width: 100%;
+	height: 40px;
+	/*position: fixed;*/
+}
+
+.nav-container {
+	margin-right: 30px;
+	margin-left: 30px;
+	font-size: 18px;
+	position: relative;
+	line-height: 40px;
+	vertical-align: middle;
+}
+
+
+
+.container-logo {
+	text-align: left;
+	display: inline-block;
+}
+
+
+.container-links {
+	text-align: right;
+	display: inline-block;
+	position: absolute;
+	right: 0px;
+}
+
+.nav-link, .nav-link1 {
+	position: relative;
+	display: inline-block;
+	margin: 0px;
+	padding-left: 0px;
+}
+
+.nav-link1 {
+	margin-right: 10px;
+}
+
+/* changed <nav> to more specific class */
+.top-nav a:link {
+	color: purple;
+}
+
+/* end navigation */
+.main {
+	margin-left: 100px;
+	margin-right: 100px;
+}

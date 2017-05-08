@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- <link rel="stylesheet" href="main.css"> -->
+    <link rel="stylesheet" href="main.css">
 
   <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 
@@ -16,31 +16,57 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 
   </head>
+    <nav class="navbar navbar-default navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Home</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+
+            </li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="">Log In </a></li>
+            <li><a href="">Sign Up </a></li>
+      
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
   <body>
-    <header role="banner">
-      <h1>Question Page</h1>
-    </header>
+    <div class="container">
+      <header role="banner">
+        <h1>Ask Your Question</h1>
+      </header>
+    </div>
 
     <main role="main">
+<div class="container">
+  <form action="" method="POST" id="askQuestion">
+    
+    <div class="form-group">
+    <label for="example-text-input" class="col-form-label">Question Title</label>
 
-<form>
-  
-  <div class="form-group">
-  <label for="example-text-input" class="col-form-label">Question Title</label>
+      <input class="form-control" type="text" id="questionTitle">
 
-    <input class="form-control" type="text" id="">
-
-</div>
-
-  <div class="form-group">
-    <label for="questionDetails">Question Details</label>
-    <textarea class="form-control" id="exampleTextarea" rows="3"></textarea>
   </div>
-  
- 
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
 
+    <div class="form-group">
+      <label for="questionDetail">Question Details</label>
+      <textarea class="form-control" id="questionDetail" rows="3"></textarea>
+    </div>
+    
+   
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>
 
     </main>
 

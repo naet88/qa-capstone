@@ -19,13 +19,21 @@ app.get("/views", (req, res) => {
 
 //i probably need something with ajax. 
 
-// $.getJSON('localhost:8080', callback);
+$.ajax({
+	type: 'POST',
+	data: JSON.stringify(data),
+    contentType: 'application/json',
+    url: 'http://localhost:3000/question-page.html',						
+    success: function(data) {
+    }
+});
 
 
+//http://stackoverflow.com/questions/32012367/how-to-submit-a-form-using-js-node-mongo-and-express
 
 //Begin CRUD operations
 
-app.get('/questions', (req, res) => {
+app.get('/', (req, res) => {
 	Question
 		.find()
 		.exec()
