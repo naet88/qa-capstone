@@ -2,13 +2,26 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const mongoose = require('mongoose');
 
+
 mongoose.Promise = global.Promise;
 
 const {PORT, DATABASE_URL} = require('./config');
 const {Question} = require('./models');
 
 const app = express();
+
+app.use(express.static('views'));
 app.use(bodyParser.json());
+
+app.get("/views", (req, res) => {
+  res.sendFile(__dirname + '/question-page.html');
+});
+
+//i probably need something with ajax. 
+
+// $.getJSON('localhost:8080', callback);
+
+
 
 //Begin CRUD operations
 
