@@ -13,20 +13,12 @@ const app = express();
 app.use(express.static('views'));
 app.use(bodyParser.json());
 
-app.get("/views", (req, res) => {
-  res.sendFile(__dirname + '/question-page.html');
-});
+// app.get("/views", (req, res) => {
+//   res.sendFile(__dirname + '/question-page.html');
+// });
 
-//i probably need something with ajax. 
 
-$.ajax({
-	type: 'POST',
-	data: JSON.stringify(data),
-    contentType: 'application/json',
-    url: 'http://localhost:3000/question-page.html',						
-    success: function(data) {
-    }
-});
+
 
 
 //http://stackoverflow.com/questions/32012367/how-to-submit-a-form-using-js-node-mongo-and-express
@@ -49,6 +41,22 @@ app.get('/', (req, res) => {
 				return res.status(500).json({message: 'Internal server error'});
 			});
 });
+
+app.get('/questions/:id', (req, res) => {
+	Question 
+		.findById(req.params.id)
+		.exec()
+		.then(questions => {
+			res.json({
+				question: questions.apiRepr()
+			});
+		})
+		.catch(
+			err => {
+				console.error(err);
+				return res.status(500).json({message: 'Internal server error'});
+			});
+}); 
 
 app.post('/questions', (req, res) => {
 	//check required fields 
@@ -80,7 +88,13 @@ app.post('/questions', (req, res) => {
 				console.error(err);
 				return res.status(500).json({message: 'Internal server error'});
 			});
+
+
+
 });
+
+
+
 
 app.put('/questions/:id', (req, res) => {
 	//assuming ids match for now
