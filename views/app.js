@@ -4,7 +4,7 @@ var state = {
 	questionTitle: '',
 	questionDetail: '',
 	username: '',
-	QuestionId: ''
+	questionId: ''
 };
 
 //STEP 2: FUNCTIONS THAT MODIFY STATE (NO JQUERY)
@@ -37,7 +37,7 @@ $('form#askQuestion').on('submit', function(event) {
 		questionDetail: questionDetail
 	};
 
-	updateQuestionConfig(data);
+	// updateQuestionConfig(data);
 
 	$.ajax({
 		type: 'POST',
@@ -48,12 +48,8 @@ $('form#askQuestion').on('submit', function(event) {
 	    	console.log(results);
 	    	var questionId = results.question.id;
 
-	    	window.location.href = 'http://localhost:8080/questions/' + questionId;
+	    	history.pushState({}, "", "http://localhost:8080/questions/" + questionId); 
 	    	
-
-	    	//be able to route the user to their question 
-	    	//but to do this, need to create a url JUST for that question...
-	    	//for instance, domain.com/example-question-1
 	    }
 	});
 });
