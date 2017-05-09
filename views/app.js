@@ -43,7 +43,7 @@ $('form#askQuestion').on('submit', function(event) {
 		type: 'POST',
 		data: JSON.stringify(data),
 	    contentType: 'application/json',
-	    url: '/questions',						
+	    url: '/api/questions',						
 	    success: function(results) {
 	    	console.log(results);
 	    	var questionId = results.question.id;

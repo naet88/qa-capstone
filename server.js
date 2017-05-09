@@ -25,7 +25,7 @@ app.use(bodyParser.json());
 
 //Begin CRUD operations
 
-app.get('/', (req, res) => {
+app.get('/api/', (req, res) => {
 	Question
 		.find()
 		.exec()
@@ -42,7 +42,7 @@ app.get('/', (req, res) => {
 			});
 });
 
-app.get('/questions/:id', (req, res) => {
+app.get('/api/questions/:id', (req, res) => {
 	Question 
 		.findById(req.params.id)
 		.exec()
@@ -58,7 +58,7 @@ app.get('/questions/:id', (req, res) => {
 			});
 }); 
 
-app.post('/questions', (req, res) => {
+app.post('/api/questions', (req, res) => {
 	//check required fields 
 	const requiredFields = ['questionTitle', 'username', 'questionDetail'];
 	for (let i = 0; i < requiredFields.length; i++) {
@@ -96,7 +96,7 @@ app.post('/questions', (req, res) => {
 
 
 
-app.put('/questions/:id', (req, res) => {
+app.put('/api/questions/:id', (req, res) => {
 	//assuming ids match for now
 	//force minimum word count  
 	const userAnswer = req.body.answer;
