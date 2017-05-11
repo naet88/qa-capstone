@@ -78,24 +78,23 @@ function intializePage() {
 		$('main').find('.js-main-page').show();
 		$('main').find('.js-question-display-page').hide();
 		$('main').find('.js-question-page').hide();
-
 		//need to do a get request
 
-		$.ajax({
-		type: 'GET',
-		data: JSON.stringify(data),
-	    contentType: 'application/json',
-	    url: '/api/',						
-	    success: function(results) {
-	    	//displays the results somehow in the DOM? 
-		}
+		// $.ajax({
+		// type: 'GET',
+		// data: JSON.stringify(data),
+	 //    contentType: 'application/json',
+	 //    url: '/api/',						
+	 //    success: function(results) {
+	 //    	//displays the results somehow in the DOM? 
+		// };
 
-	else if (window.location.href === "http://localhost:8080/question-page.html") {
+	} else if (window.location.href === "http://localhost:8080/question-page.html") {
 		$('main').find('.js-main-page').hide();
 		$('main').find('.js-question-page').show();
 		$('main').find('.js-question-display-page').hide();
-	} 
-	else if (window.location.href === "http://localhost:8080/question-display-page.html") {
+	
+	} else if (window.location.href === "http://localhost:8080/question-display-page.html") {
 		$('main').find('.js-main-page').hide();
 		$('main').find('.js-question-page').hide();
 		$('main').find('.js-question-display-page').show();
