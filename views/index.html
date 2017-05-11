@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Question Page</title>
+    <title>Question and Answer</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,80 +16,92 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 
   </head>
-    <nav class="navbar navbar-default navbar-static-top">
+  
+  <body>
+    <nav class="js-hide navbar navbar-default navbar-static-top">
       <div class="container">
         <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">Home</a>
+          <a class="navbar-brand" href="/index.html">Home</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
-
-            </li>
-          </ul>
           <ul class="nav navbar-nav navbar-right">
             <li><a href="">Log In </a></li>
             <li><a href="">Sign Up </a></li>
-      
           </ul>
         </div>
       </div>
     </nav>
 
-  <body>
-    <main role="main">
+    <main>
+<!-- begin main page -->
+      <div class="js-main-page">
+        <div class="container">   
+          <header role="banner">
+            <h1>All Questions</h1>
+          </header>
+
+          <table class="table table-hover">
+            <thead>
+
+            </thead>
+            <tbody>
+              <tr>
+                <td>3 Likes </td>
+                <td>2 Answers</td>
+                <td>Question Title</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="container">
+            <button type="submit" class="btn btn-lg"><a href="http://localhost:8080/question-page.html">Ask a Question!</a></button>  
+          </div>
+        </div>
+      </div>
+<!-- end main page -->
+
 
 <!-- begin question form -->
-
-      <div class="container">
-      <header role="banner">
-        <h1>Ask Your Question</h1>
-      </header>
-    </div>
-
-    <main role="main">
-<div class="container">
-  <form action="" method="POST" id="askQuestion">
     
-    <div class="form-group">
-    <label for="example-text-input" class="col-form-label">Question Title</label>
+      <div class="js-question-page">
+        <div class="container">
+          <header role="banner">
+            <h1>Ask Your Question</h1>
+          
 
-      <input class="form-control" type="text" id="questionTitle">
+          <form action="" method="POST" id="askQuestion">
+            <div class="form-group">
+              <label for="example-text-input" class="col-form-label">Question Title</label>
+              <input class="form-control" type="text" id="questionTitle">
+            </div>
 
-  </div>
-
-    <div class="form-group">
-      <label for="questionDetail">Question Details</label>
-      <textarea class="form-control" id="questionDetail" rows="3"></textarea>
-    </div>
-    
-   
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
-</div>
-
+            <div class="form-group">
+              <label for="questionDetail">Question Detail</label>
+              <textarea class="form-control" id="questionDetail" rows="3"></textarea>
+            </div>
+       
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
 <!-- end question form -->
 
-      <div class="container panel-container js-panel">
+<!-- begin question display -->
+      <div class="js-question-display-page container panel-container js-panel">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h3 class="js-questionTitle">Question Title</h3>
-            
+            <h3 class="js-questionTitle"></h3>
           </div>
 
           <div class="panel-body js-questionDetail">
             Question Details
           </div>
         </div>
-      </div>
 
-      <div class="container">
-       <button type="" class="btn btn-secondary btn-lg">Answer!</button>
+        <button type="submit" class="btn btn-secondary btn-lg">Answer!</button>
       </div>
+<!-- end question display -->
+
     </main>
 
     <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>

@@ -10,18 +10,13 @@ const {Question} = require('./models');
 
 const app = express();
 
-app.use(express.static('views'));
+app.get('/:page.html', (req, res) => {
+	res.sendFile(__dirname + '/views/index.html');	
+})
+
+app.use(express.static('static'));
+
 app.use(bodyParser.json());
-
-// app.get("/views", (req, res) => {
-//   res.sendFile(__dirname + '/question-page.html');
-// });
-
-
-
-
-
-//http://stackoverflow.com/questions/32012367/how-to-submit-a-form-using-js-node-mongo-and-express
 
 //Begin CRUD operations
 
