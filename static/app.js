@@ -1,6 +1,6 @@
 //QUESTIONS
 //1. LINES 63-67 --> post request + URL. Is this remotely correct?
-//2. GET request for initialize page. Should this go in the "render in DOM piece?" Am I even in the right trac here?
+//2. GET request for initialize page. Should this go in the "render in DOM piece?" Am I even in the right track here?
 
 //STEP 1: STATE
 
@@ -48,6 +48,7 @@ $('form#askQuestion').on('submit', function(event) {
 		data: JSON.stringify(data),
 	    contentType: 'application/json',
 	    url: '/api/questions',						
+	    //need to handle errors at some point 
 	    success: function(results) {
 			
 			updateQuestionConfig(results);
@@ -57,15 +58,13 @@ $('form#askQuestion').on('submit', function(event) {
 	    	var questionDetail = results.question.questionDetail;
 
 	    	history.pushState({}, "", "http://localhost:8080/question-display-page.html?id="+questionId); 
+	    	
+	    	$('main').find('.js-questionTitle').text(questionTitle);
+			$('main').find('.js-questionDetail').text(questionDetail);
 
 	    	//if i refresh, this doesn't work. sigh. 
-	    	if (window.location.href === "http://localhost:8080/question-display-page.html?id="+questionId) {
-				$('main').find('.js-main-page').hide();
-				$('main').find('.js-question-page').hide();
-				$('main').find('.js-question-display-page').show();
-				$('main').find('.js-questionTitle').text(questionTitle);
-				$('main').find('.js-questionDetail').text(questionDetail);
-			};
+	    	intializePage();
+
 	    }
 	});
 });
@@ -77,8 +76,7 @@ function intializePage() {
 	if (window.location.href === "http://localhost:8080/index.html") {
 		$('main').find('.js-main-page').show();
 		$('main').find('.js-question-display-page').hide();
-		$('main').find('.js-question-page').hide();
-		//need to do a get request
+		$('main').find('.js-question-page').hide();	
 
 		// $.ajax({
 		// type: 'GET',
@@ -94,11 +92,12 @@ function intializePage() {
 		$('main').find('.js-question-page').show();
 		$('main').find('.js-question-display-page').hide();
 	
-	} else if (window.location.href === "http://localhost:8080/question-display-page.html") {
+	} else if (window.location.href.match(new RegExp("^http://localhost:8080/question-display-page.html"))) {
 		$('main').find('.js-main-page').hide();
 		$('main').find('.js-question-page').hide();
 		$('main').find('.js-question-display-page').show();
 	}
+
 };
 
 intializePage();
