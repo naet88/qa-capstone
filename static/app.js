@@ -1,7 +1,3 @@
-//QUESTIONS
-//1. LINES 63-67 --> post request + URL. Is this remotely correct?
-//2. GET request for initialize page. Should this go in the "render in DOM piece?" Am I even in the right track here?
-
 //STEP 1: STATE
 
 var state = {
@@ -20,12 +16,55 @@ function updateQuestionConfig(object) {
 	state.questionId = object.question.id;
 }
 
+function updateQuestionIdState(object) {
+	state.questionId = object;
+}
+
 //STEP 3: RENDER IN THE DOM FUNCTIONS
 
-function renderQuestionDisplayPage(state, element) {
-	$(element).find('.js-questionTitle').text(state.questionTitle);
-	$(element).find('.js-questionDetail').text(state.questionDetail);
-}
+
+// function renderQuestionDisplayPage(state, element) {
+// 	$(element).find('.js-questionTitle').text(state.questionTitle);
+// 	$(element).find('.js-questionDetail').text(state.questionDetail);
+
+// 	//use this id: 5915f3bf106a4c196d413be1
+// 	$.ajax({
+// 		type: 'GET',
+// 	    contentType: 'application/json',
+// 	    url: '/api/questions/'+ state.questionId,						
+// 	    success: function(question) {
+// 	    	$(element).find('.js-questionTitle').text(question.questionTitle);
+// 			$(element).find('.js-questionDetail').text(question.questionDetail);
+
+// 		}
+// 	});
+
+// };
+
+//http://localhost:8080/question-display-page.html/5915f3bf106a4c196d413be1
+
+function renderQuestionDisplayPage() {
+
+	if (window.location.href.match(new RegExp("^http://localhost:8080/question-display-page.html"))) {
+		$('main').find('.js-main-page').hide();
+		$('main').find('.js-question-page').hide();
+		$('main').find('.js-question-display-page').show();
+
+		//use this id: 5915f3bf106a4c196d413be1
+		$.ajax({
+			type: 'GET',
+		    contentType: 'application/json',
+		    url: '/api/questions/5915f3bf106a4c196d413be1',						
+		    success: function(data) {
+		    	console.log(data);
+			}
+		});
+	};
+
+};
+
+renderQuestionDisplayPage();
+
 
 //STEP 4: JQUERY EVENT LISTENERS
 
@@ -41,7 +80,6 @@ $('form#askQuestion').on('submit', function(event) {
 		questionDetail: questionDetail
 	};
 
-	// updateQuestionConfig(data);
 
 	$.ajax({
 		type: 'POST',
@@ -57,35 +95,29 @@ $('form#askQuestion').on('submit', function(event) {
 	    	var questionTitle = results.question.questionTitle;
 	    	var questionDetail = results.question.questionDetail;
 
-	    	history.pushState({}, "", "http://localhost:8080/question-display-page.html?id="+questionId); 
+
 	    	
 	    	$('main').find('.js-questionTitle').text(questionTitle);
 			$('main').find('.js-questionDetail').text(questionDetail);
 
 	    	//if i refresh, this doesn't work. sigh. 
-	    	intializePage();
-
+	    	navigate("http://localhost:8080/question-display-page.html?"+questionId);
 	    }
 	});
 });
 
-
-
 //INITIALIZE APP
-function intializePage() {
-	if (window.location.href === "http://localhost:8080/index.html") {
+function navigate(url) {
+	history.pushState({}, "", url); 
+	refreshPage();
+};
+
+function refreshPage() {
+
+	if (window.location.href === "http://localhost:8080/index") {
 		$('main').find('.js-main-page').show();
 		$('main').find('.js-question-display-page').hide();
 		$('main').find('.js-question-page').hide();	
-
-		// $.ajax({
-		// type: 'GET',
-		// data: JSON.stringify(data),
-	 //    contentType: 'application/json',
-	 //    url: '/api/',						
-	 //    success: function(results) {
-	 //    	//displays the results somehow in the DOM? 
-		// };
 
 	} else if (window.location.href === "http://localhost:8080/question-page.html") {
 		$('main').find('.js-main-page').hide();
@@ -96,24 +128,26 @@ function intializePage() {
 		$('main').find('.js-main-page').hide();
 		$('main').find('.js-question-page').hide();
 		$('main').find('.js-question-display-page').show();
-	}
+
+		var currentUrl = window.location.href;
+
+		var Id = currentUrl.split("?")[1];
+
+		state.questionId = Id;
+		console.log(state.questionId);
+
+		//need function w/ a get request that injects the data from ID into the webpage
+
+		history.pushState({}, "", "http://localhost:8080/question-display-page.html/"+state.questionId);
+		renderQuestionDisplayPage(state, $('main'));
+		
+		// var testregex = window.location.href.match(new RegExp("^http://localhost:8080/question-display-page.html((\w+))"))
+		
+	} 
 
 };
 
-intializePage();
+// refreshPage();
 
-
-
-// if (window.location.href === "http://localhost:8080/question-page.html") {
-// 	$('.js-question-page').show();
-// };
-
-// else (window.location.href === "http://localhost:8080/question-display-page")
-// // INITIALIZE APP 
-
-// if (window.location.href === "http://localhost:8080/question-page.html") { $('.js-question-page').show(); } 
-// else (window.location.href === "http://localhost:8080/question-display-page.html") 
-// { // Somehow fetch the id of the question we want to display 
-// // http://localhost:8080/question-display-page.html?id=5ab4538643563456534 $('.js-question-display-page').show(); }
 
 
