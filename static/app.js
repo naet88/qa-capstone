@@ -63,8 +63,6 @@ function renderQuestionDisplayPage() {
 
 };
 
-renderQuestionDisplayPage();
-
 
 //STEP 4: JQUERY EVENT LISTENERS
 
@@ -109,22 +107,22 @@ $('form#askQuestion').on('submit', function(event) {
 //INITIALIZE APP
 function navigate(url) {
 	history.pushState({}, "", url); 
-	refreshPage();
+	renderPage();
 };
 
-function refreshPage() {
+function renderPage() {
 
-	if (window.location.href === "http://localhost:8080/index") {
+	if (window.location.href === "http://localhost:8080/") {
 		$('main').find('.js-main-page').show();
 		$('main').find('.js-question-display-page').hide();
 		$('main').find('.js-question-page').hide();	
 
-	} else if (window.location.href === "http://localhost:8080/question-page.html") {
+	} else if (window.location.href === "http://localhost:8080/ask-question") {
 		$('main').find('.js-main-page').hide();
 		$('main').find('.js-question-page').show();
 		$('main').find('.js-question-display-page').hide();
 	
-	} else if (window.location.href.match(new RegExp("^http://localhost:8080/question-display-page.html"))) {
+	} else if (window.location.href.match(new RegExp("^http://localhost:8080/question"))) {
 		$('main').find('.js-main-page').hide();
 		$('main').find('.js-question-page').hide();
 		$('main').find('.js-question-display-page').show();
@@ -147,7 +145,7 @@ function refreshPage() {
 
 };
 
-// refreshPage();
+renderPage();
 
 
 

@@ -10,9 +10,15 @@ const {Question} = require('./models');
 
 const app = express();
 
-app.get('/:page.html', (req, res) => {
-	res.sendFile(__dirname + '/views/index.html');	
-})
+function serveIndex (req, res) {
+	res.sendFile(__dirname + '/static/index.html');	
+}
+
+app.get('/', serveIndex);
+
+app.get('/ask-question', serveIndex);
+
+app.get('/question', serveIndex);
 
 app.use(express.static('static'));
 
