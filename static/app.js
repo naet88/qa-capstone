@@ -4,12 +4,13 @@ var state = {
 	questionTitle: '',
 	questionDetail: '',
 	username: '',
-	questionId: ''
+	questionId: '',
+	likeCount: ''
 };
 
 //STEP 2: FUNCTIONS THAT MODIFY STATE (NO JQUERY)
 
-function updateQuestionConfig(object) {
+function updateQuestionState(object) {
 	state.questionTitle = object.question.questionTitle;
 	state.questionDetail = object.question.questionDetail;
 	state.username = object.question.username;
@@ -22,46 +23,40 @@ function updateQuestionIdState(object) {
 
 //STEP 3: RENDER IN THE DOM FUNCTIONS
 
+//http://localhost:8080/question/5915f3bf106a4c196d413be1
 
-// function renderQuestionDisplayPage(state, element) {
-// 	$(element).find('.js-questionTitle').text(state.questionTitle);
-// 	$(element).find('.js-questionDetail').text(state.questionDetail);
+function getQuestionData(currentUrl) {
+//whole point is to fetch the Q 
+//retrieve questionID from state and inect into url 
+	
+	var Id = currentUrl.split("?")[1];
 
-// 	//use this id: 5915f3bf106a4c196d413be1
-// 	$.ajax({
-// 		type: 'GET',
-// 	    contentType: 'application/json',
-// 	    url: '/api/questions/'+ state.questionId,						
-// 	    success: function(question) {
-// 	    	$(element).find('.js-questionTitle').text(question.questionTitle);
-// 			$(element).find('.js-questionDetail').text(question.questionDetail);
+	state.questionId = Id;
 
-// 		}
-// 	});
-
-// };
-
-//http://localhost:8080/question-display-page.html/5915f3bf106a4c196d413be1
-
-function renderQuestionDisplayPage() {
-
-	if (window.location.href.match(new RegExp("^http://localhost:8080/question-display-page.html"))) {
-		$('main').find('.js-main-page').hide();
-		$('main').find('.js-question-page').hide();
-		$('main').find('.js-question-display-page').show();
-
-		//use this id: 5915f3bf106a4c196d413be1
-		$.ajax({
-			type: 'GET',
-		    contentType: 'application/json',
-		    url: '/api/questions/5915f3bf106a4c196d413be1',						
-		    success: function(data) {
-		    	console.log(data);
-			}
-		});
-	};
-
+	$.ajax({
+		type: 'GET',
+	    contentType: 'application/json',
+	    url: '/api/questions/' + state.questionId,						
+	    success: function(data) {
+			$('main').find('.js-questionTitle').text(data.question.questionTitle);
+			$('main').find('.js-questionDetail').text(data.question.questionDetail);
+		}
+	});
 };
+
+function getAllQuestions() {
+	$.ajax({
+		type: 'GET',
+	    contentType: 'application/json',
+	    url: '/api/',						
+	    success: function(object) {
+			for (i=0; i <= 10; i++) {
+				// console.log(object.questions[i].questionTitle);
+				$('main').find('.js-table').append("<tr><td>" + object.questions[i].questionTitle + "</td></tr>");
+			}
+		}
+	});
+}
 
 
 //STEP 4: JQUERY EVENT LISTENERS
@@ -78,7 +73,6 @@ $('form#askQuestion').on('submit', function(event) {
 		questionDetail: questionDetail
 	};
 
-
 	$.ajax({
 		type: 'POST',
 		data: JSON.stringify(data),
@@ -86,38 +80,43 @@ $('form#askQuestion').on('submit', function(event) {
 	    url: '/api/questions',						
 	    //need to handle errors at some point 
 	    success: function(results) {
-			
-			updateQuestionConfig(results);
-
-	    	var questionId = results.question.id;
-	    	var questionTitle = results.question.questionTitle;
-	    	var questionDetail = results.question.questionDetail;
-
-
-	    	
-	    	$('main').find('.js-questionTitle').text(questionTitle);
-			$('main').find('.js-questionDetail').text(questionDetail);
-
-	    	//if i refresh, this doesn't work. sigh. 
-	    	navigate("http://localhost:8080/question-display-page.html?"+questionId);
+	    	//state is now updated 
+	    	updateQuestionState(results);
+	    	navigate("http://localhost:8080/question?" + state.questionId);
 	    }
 	});
 });
 
-//INITIALIZE APP
+//initially this was success callback but didn't work
+
+// function postQuestionCallback(results) {
+			
+// 	updateQuestionState(results);
+
+// 	navigate("http://localhost:8080/question?" + state.questionId);
+// };
+
+
 function navigate(url) {
 	history.pushState({}, "", url); 
 	renderPage();
 };
 
+
+//INITIALIZE APP
+
 function renderPage() {
 
-	if (window.location.href === "http://localhost:8080/") {
+	var currentUrl = window.location.href;
+
+	if (currentUrl === "http://localhost:8080/") {
 		$('main').find('.js-main-page').show();
 		$('main').find('.js-question-display-page').hide();
 		$('main').find('.js-question-page').hide();	
 
-	} else if (window.location.href === "http://localhost:8080/ask-question") {
+		getAllQuestions()
+
+	} else if (currentUrl === "http://localhost:8080/ask-question") {
 		$('main').find('.js-main-page').hide();
 		$('main').find('.js-question-page').show();
 		$('main').find('.js-question-display-page').hide();
@@ -127,25 +126,31 @@ function renderPage() {
 		$('main').find('.js-question-page').hide();
 		$('main').find('.js-question-display-page').show();
 
-		var currentUrl = window.location.href;
-
-		var Id = currentUrl.split("?")[1];
-
-		state.questionId = Id;
-		console.log(state.questionId);
-
-		//need function w/ a get request that injects the data from ID into the webpage
-
-		history.pushState({}, "", "http://localhost:8080/question-display-page.html/"+state.questionId);
-		renderQuestionDisplayPage(state, $('main'));
-		
-		// var testregex = window.location.href.match(new RegExp("^http://localhost:8080/question-display-page.html((\w+))"))
+		getQuestionData(currentUrl);
 		
 	} 
-
 };
 
 renderPage();
+
+// function updateQuestionPageState() {
+// 	if (window.location.href.match(new RegExp("^http://localhost:8080/question"))) {
+// 		var currentUrl = window.location.href;
+// 		var Id = currentUrl.split("?")[1];
+
+// 		state.questionId = Id;
+// 		console.log(state.questionId);
+
+// 		//need function w/ a get request that injects the data from ID into the webpage
+
+// 		history.pushState({}, "", "http://localhost:8080/question-display-page.html/"+state.questionId);
+// 		renderQuestionDisplayPage(state, $('main'));
+// 	}
+
+// };
+
+
+// updatePageState();
 
 
 
