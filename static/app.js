@@ -1,3 +1,13 @@
+//HIGH PRIORITY Things to go over
+//1. success callback - not sure why I can't factorize this.
+//2. Next steps? What to work on? I think I can get the homepage to work properly...so anything aside from this. 
+//I think it's the answer section...does the URL change for that?
+//
+//low priority:
+// not a big deal, but "back" button doesn't work. I think I have to pushstate
+
+
+
 //STEP 1: STATE
 
 var state = {
@@ -15,6 +25,7 @@ function updateQuestionState(object) {
 	state.questionDetail = object.question.questionDetail;
 	state.username = object.question.username;
 	state.questionId = object.question.id;
+	state.likeCount = object.question.likeCount;
 }
 
 function updateQuestionIdState(object) {
@@ -28,7 +39,8 @@ function updateQuestionIdState(object) {
 function getQuestionData(currentUrl) {
 //whole point is to fetch the Q 
 //retrieve questionID from state and inect into url 
-	
+	// navigate(currentUrl);
+
 	var Id = currentUrl.split("?")[1];
 
 	state.questionId = Id;
@@ -52,6 +64,8 @@ function getAllQuestions() {
 	    success: function(object) {
 			for (i=0; i <= 10; i++) {
 				// console.log(object.questions[i].questionTitle);
+				var qtitle = object.questions[i].questionTitle;
+
 				$('main').find('.js-table').append("<tr><td>" + object.questions[i].questionTitle + "</td></tr>");
 			}
 		}
@@ -70,7 +84,8 @@ $('form#askQuestion').on('submit', function(event) {
 	var data = {
 		questionTitle: question,
 		username: username,
-		questionDetail: questionDetail
+		questionDetail: questionDetail,
+		questionLikeCount: 0
 	};
 
 	$.ajax({
@@ -86,6 +101,15 @@ $('form#askQuestion').on('submit', function(event) {
 	    }
 	});
 });
+
+
+$('form#answerQuestion').on('submit', function(event) {
+	event.preventDefault();
+	
+});
+
+
+
 
 //initially this was success callback but didn't work
 
@@ -113,6 +137,7 @@ function renderPage() {
 		$('main').find('.js-main-page').show();
 		$('main').find('.js-question-display-page').hide();
 		$('main').find('.js-question-page').hide();	
+		$('main').find('.js-answerQuestion').hide();	
 
 		getAllQuestions()
 
@@ -120,11 +145,13 @@ function renderPage() {
 		$('main').find('.js-main-page').hide();
 		$('main').find('.js-question-page').show();
 		$('main').find('.js-question-display-page').hide();
+		$('main').find('.js-answerQuestion').hide();
 	
 	} else if (window.location.href.match(new RegExp("^http://localhost:8080/question"))) {
 		$('main').find('.js-main-page').hide();
 		$('main').find('.js-question-page').hide();
 		$('main').find('.js-question-display-page').show();
+		$('main').find('.js-answerQuestion').hide();
 
 		getQuestionData(currentUrl);
 		
