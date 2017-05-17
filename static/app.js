@@ -1,3 +1,5 @@
+/* global $ */
+
 //STEP 1: STATE
 
 var state = {
