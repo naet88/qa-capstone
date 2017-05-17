@@ -94,18 +94,15 @@ $('form#askQuestion').on('submit', function(event) {
 	    contentType: 'application/json',
 	    url: '/api/questions',						
 	    //need to handle errors at some point 
-	    success: function(results) {
-	    	//state is now updated 
-	    	updateQuestionState(results);
-	    	navigate("http://localhost:8080/question?" + state.questionId);
-	    }
+	    success: postQuestionCallback
 	});
 });
 
 
-$('form#answerQuestion').on('submit', function(event) {
+$('button.js-answer-button').on('click', function(event) {
 	event.preventDefault();
-	
+
+	$('main').find('.js-answerQuestion').show();
 });
 
 
@@ -113,12 +110,10 @@ $('form#answerQuestion').on('submit', function(event) {
 
 //initially this was success callback but didn't work
 
-// function postQuestionCallback(results) {
-			
-// 	updateQuestionState(results);
-
-// 	navigate("http://localhost:8080/question?" + state.questionId);
-// };
+function postQuestionCallback(results) {	
+	updateQuestionState(results);
+	navigate("http://localhost:8080/question?" + state.questionId);
+};
 
 
 function navigate(url) {
