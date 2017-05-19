@@ -101,19 +101,31 @@
         <button type="submit" class="js-answer-button btn btn-secondary btn-lg">Answer!</button>
       </div>
 <!-- end question display -->
+
+<!-- begin answer display -->
     <div class="js-answerQuestion container">
-      <form action="" method="POST" id="answerQuestion">
+      <form action="" method="PUT" id="answerQuestion">
 
         <div class="form-group">
-          <label for="answer">Answer</label>
-          <textarea class="form-control" id="questionDetail" rows="3"></textarea>
+          <label for="answer">Your Answer:</label>
+          <textarea class="form-control" id="answerDetail" rows="3"></textarea>
         </div>
    
         <button type="submit" class="btn btn-primary">Submit</button>
       </form>
     </div>
-<!-- begin answer display -->
 
+    <div class="js-answerDisplay container">
+      <div class="panel-container js-panel">
+        <h2>Answers:</h2>
+          <div class="js-answer-panel panel panel-default">
+            <div class="panel-body">
+              <p></p>
+              <strong><p></p></strong>
+            </div>
+          </div>
+      </div>
+    </div>
 
 <!-- end answer display -->
 

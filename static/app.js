@@ -1,178 +1,213 @@
-//HIGH PRIORITY Things to go over
-//1. success callback - not sure why I can't factorize this.
-//2. Next steps? What to work on? I think I can get the homepage to work properly...so anything aside from this. 
-//I think it's the answer section...does the URL change for that?
-//
-//low priority:
-// not a big deal, but "back" button doesn't work. I think I have to pushstate
+/* global $ */
 
-
-
-//STEP 1: STATE
+// STEP 1: STATE
 
 var state = {
-	questionTitle: '',
-	questionDetail: '',
-	username: '',
-	questionId: '',
-	likeCount: ''
+  questionTitle: '',
+  questionDetail: '',
+  username: '',
+  questionId: '',
+  likeCount: ''
 };
 
-//STEP 2: FUNCTIONS THAT MODIFY STATE (NO JQUERY)
+// STEP 2: FUNCTIONS THAT MODIFY STATE (NO JQUERY)
 
 function updateQuestionState(object) {
-	state.questionTitle = object.question.questionTitle;
-	state.questionDetail = object.question.questionDetail;
-	state.username = object.question.username;
-	state.questionId = object.question.id;
-	state.likeCount = object.question.likeCount;
+  state.questionTitle = object.question.questionTitle;
+  state.questionDetail = object.question.questionDetail;
+  state.username = object.question.username;
+  state.questionId = object.question.id;
+  state.likeCount = object.question.likeCount;
 }
 
-function updateQuestionIdState(object) {
-	state.questionId = object;
+function getQuestionId(url) {
+  var Id = url.split('?')[1];
+  state.questionId = Id;
+  return Id;
 }
 
-//STEP 3: RENDER IN THE DOM FUNCTIONS
+// STEP 3: RENDER IN THE DOM FUNCTIONS
 
-//http://localhost:8080/question/5915f3bf106a4c196d413be1
+function renderPage() {
+  var currentUrl = window.location.href;
 
-function getQuestionData(currentUrl) {
-//whole point is to fetch the Q 
-//retrieve questionID from state and inect into url 
-	// navigate(currentUrl);
+  if (currentUrl === 'http://localhost:8080/') {
+    $('main').find('.js-main-page').show();
+    $('main').find('.js-question-display-page').hide();
+    $('main').find('.js-question-page').hide();
+    $('main').find('.js-answerQuestion').hide();
+    $('main').find('.js-answerDisplay').hide();
 
-	var Id = currentUrl.split("?")[1];
+    getAllQuestions();
 
-	state.questionId = Id;
+  } else if (currentUrl === 'http://localhost:8080/ask-question') {
+    $('main').find('.js-main-page').hide();
+    $('main').find('.js-question-page').show();
+    $('main').find('.js-question-display-page').hide();
+    $('main').find('.js-answerQuestion').hide();
+    $('main').find('.js-answerDisplay').hide();
+ 
+  } else if (window.location.href.match(new RegExp('^http://localhost:8080/question'))) {
+    $('main').find('.js-main-page').hide();
+    $('main').find('.js-question-page').hide();
+    $('main').find('.js-question-display-page').show();
+    $('main').find('.js-answerQuestion').hide();
+    $('main').find('.js-answerDisplay').hide();
 
-	$.ajax({
-		type: 'GET',
-	    contentType: 'application/json',
-	    url: '/api/questions/' + state.questionId,						
-	    success: function(data) {
-			$('main').find('.js-questionTitle').text(data.question.questionTitle);
-			$('main').find('.js-questionDetail').text(data.question.questionDetail);
-		}
-	});
-};
+    getQAData(currentUrl);
+  }
+}
 
+$('button.js-answer-button').on('click', function (event) {
+  event.preventDefault();
+  $('main').find('button.js-answer-button').hide();
+  $('main').find('.js-answerQuestion').show();
+  $('main').find('.js-answerDisplay').hide();
+});
+
+function getQAData(currentUrl) {
+  var Id = currentUrl.split('?')[1];
+
+  state.questionId = Id;
+
+  $.ajax({
+    type: 'GET',
+    contentType: 'application/json',
+    url: '/api/questions/' + state.questionId,       
+    // This success callback doesn't work if I factorize this bit (starts line 100)
+    success: function (data) {
+      $('main').find('.js-questionTitle').text(data.question.questionTitle);
+      $('main').find('.js-questionDetail').text(data.question.questionDetail);
+
+      //if this data exists -- is this correct?
+      if (data.question.answers.length > 0) {
+        console.log('there is an answer', data.question.answers.content)
+        $('main').find('.js-answerDisplay').show();
+          // I'm sure this is not the best way to do this. 
+          data.question.answers.forEach(function (item) {
+            console.log(item.content);
+            $('main').find('.js-answer-panel').append(
+              '<div class="panel-body">\
+              <p>' + item.content + '</p>\
+              <strong><p>' + item.username + '</p></strong>\
+              </div>');
+          });
+      }
+    }
+  });
+}
+
+// function getQADataCallback (data) {
+//   $('main').find('.js-questionTitle').text(data.question.questionTitle);
+//   $('main').find('.js-questionDetail').text(data.question.questionDetail);
+
+//   //if this data exists -- is this correct?
+//   if (data.question.answers.length > 0) {
+//     console.log('there is an answer', data.question.answers.content)
+
+//     $('main').find('.js-answerDisplay').show();
+      
+//       // I'm sure this is not the best way to do this. 
+//       data.question.answers.forEach(function (item) {
+//         console.log(item.content);
+//         $('main').find('.js-answer-panel').append(
+//           '<div class="panel-body">\
+//           <p>' + item.content + '</p>\
+//           <strong><p>' + item.username + '</p></strong>\
+//           </div>');
+//       });
+//   }
+// }
+
+
+// FRONT PAGE
 function getAllQuestions() {
-	$.ajax({
-		type: 'GET',
-	    contentType: 'application/json',
-	    url: '/api/',						
-	    success: function(object) {
-			for (i=0; i <= 10; i++) {
-				// console.log(object.questions[i].questionTitle);
-				var qtitle = object.questions[i].questionTitle;
-
-				$('main').find('.js-table').append("<tr><td>" + object.questions[i].questionTitle + "</td></tr>");
-			}
-		}
-	});
+  $.ajax({
+    type: 'GET',
+    contentType: 'application/json',
+    url: '/api/',        
+    success: function (object) {
+      for (var i = 0; i <= 10; i++) {
+        var qtitle = object.questions[i].questionTitle;
+        // console.log(object.questions[i].questionTitle);
+        $('main').find('.js-table').append('<tr><td>' + object.questions[i].questionTitle + '</td></tr>');
+      }
+    }
+  });
 }
 
+// STEP 4: JQUERY EVENT LISTENERS
 
-//STEP 4: JQUERY EVENT LISTENERS
+$('form#askQuestion').on('submit', function (event) {
+  event.preventDefault();
+  var question = $('#questionTitle').val();
+  var questionDetail = $('#questionDetail').val();
+  var username = 'username';
 
-$('form#askQuestion').on('submit', function(event) {
-	event.preventDefault();
-	var question = $('#questionTitle').val();
-	var questionDetail = $('#questionDetail').val();
-	var username = 'username';
+  var data = {
+    questionTitle: question,
+    username: username,
+    questionDetail: questionDetail,
+    questionLikeCount: 0
+  };
 
-	var data = {
-		questionTitle: question,
-		username: username,
-		questionDetail: questionDetail,
-		questionLikeCount: 0
-	};
-
-	$.ajax({
-		type: 'POST',
-		data: JSON.stringify(data),
-	    contentType: 'application/json',
-	    url: '/api/questions',						
-	    //need to handle errors at some point 
-	    success: postQuestionCallback
-	});
+  $.ajax({
+    type: 'POST',
+    data: JSON.stringify(data),
+    contentType: 'application/json',
+    url: '/api/questions',        
+    // need to handle errors at some point
+    success: postQACallback
+  });
 });
 
+function postQACallback(results) {
+  updateQuestionState(results);
+  navigate('http://localhost:8080/question?' + state.questionId);
+}
 
-$('button.js-answer-button').on('click', function(event) {
-	event.preventDefault();
+$('form#answerQuestion').on('submit', function (event) {
+  event.preventDefault();
+  var currentUrl = window.location.href;
+  var qId = getQuestionId(currentUrl);
 
-	$('main').find('.js-answerQuestion').show();
+  var answer = $('#answerDetail').val();
+  var username = 'username';
+
+  var data = {
+        answers: {
+          content: answer,
+          likeCount: 0,
+          username: username
+        }
+  };
+
+  $.ajax({
+    type: 'PUT',
+    data: JSON.stringify(data),
+    contentType: 'application/json',
+    url: '/api/questions/' + state.questionId,
+    success: answerQuestionCallback
+  });
 });
 
+function answerQuestionCallback(data) {
+  $('main').find('form#answerQuestion').hide();
+  $('main').find('.js-answerDisplay').show();
 
+  $('main').find('p.js-answer').text(data.answers.content);
+  $('main').find('p.js-answer-username').text(data.answers.username);
+}
 
-
-//initially this was success callback but didn't work
-
-function postQuestionCallback(results) {	
-	updateQuestionState(results);
-	navigate("http://localhost:8080/question?" + state.questionId);
-};
+//where should these two go in terms of organizing the code "best practice"
 
 
 function navigate(url) {
-	history.pushState({}, "", url); 
-	renderPage();
-};
+  history.pushState({}, '', url);
+  renderPage();
+}
 
-
-//INITIALIZE APP
-
-function renderPage() {
-
-	var currentUrl = window.location.href;
-
-	if (currentUrl === "http://localhost:8080/") {
-		$('main').find('.js-main-page').show();
-		$('main').find('.js-question-display-page').hide();
-		$('main').find('.js-question-page').hide();	
-		$('main').find('.js-answerQuestion').hide();	
-
-		getAllQuestions()
-
-	} else if (currentUrl === "http://localhost:8080/ask-question") {
-		$('main').find('.js-main-page').hide();
-		$('main').find('.js-question-page').show();
-		$('main').find('.js-question-display-page').hide();
-		$('main').find('.js-answerQuestion').hide();
-	
-	} else if (window.location.href.match(new RegExp("^http://localhost:8080/question"))) {
-		$('main').find('.js-main-page').hide();
-		$('main').find('.js-question-page').hide();
-		$('main').find('.js-question-display-page').show();
-		$('main').find('.js-answerQuestion').hide();
-
-		getQuestionData(currentUrl);
-		
-	} 
-};
+// INITIALIZE APP
 
 renderPage();
-
-// function updateQuestionPageState() {
-// 	if (window.location.href.match(new RegExp("^http://localhost:8080/question"))) {
-// 		var currentUrl = window.location.href;
-// 		var Id = currentUrl.split("?")[1];
-
-// 		state.questionId = Id;
-// 		console.log(state.questionId);
-
-// 		//need function w/ a get request that injects the data from ID into the webpage
-
-// 		history.pushState({}, "", "http://localhost:8080/question-display-page.html/"+state.questionId);
-// 		renderQuestionDisplayPage(state, $('main'));
-// 	}
-
-// };
-
-
-// updatePageState();
-
-
 

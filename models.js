@@ -2,10 +2,22 @@ const mongoose = require('mongoose');
 
 //Mongoose models need to have a Schema defined!
 
+// const questionSchema = mongoose.Schema({
+// 	questionTitle: {type: String, required: true},
+// 	username: {type: String, required: true},
+// 	questionDetail: {type: String, required: true},
+// 	questionLikeCount: {type: Number},
+// 	answers: [{
+// 		content: {type: String, required: true},
+// 		likeCount: {type: Number},
+// 		username: {type: String, required: true}
+// 	}]
+// });
+
 const questionSchema = mongoose.Schema({
-	questionTitle: {type: String, required: true},
-	username: {type: String, required: true},
-	questionDetail: {type: String, required: true},
+	questionTitle: {type: String},
+	username: {type: String},
+	questionDetail: {type: String},
 	questionLikeCount: {type: Number},
 	answers: [{
 		content: {type: String},
@@ -13,8 +25,6 @@ const questionSchema = mongoose.Schema({
 		username: {type: String}
 	}]
 });
-
-
 
 questionSchema.methods.apiRepr = function() {
 	return {
@@ -27,7 +37,6 @@ questionSchema.methods.apiRepr = function() {
 	};
 }
 
-//Ah...what do w/ the answer?!?!
 const Question = mongoose.model('Question', questionSchema);
 
 module.exports = {Question};
