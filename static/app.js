@@ -18,6 +18,7 @@ function updateQuestionState(object) {
   state.username = object.question.username;
   state.questionId = object.question.id;
   state.likeCount = object.question.likeCount;
+  // state.answersContent = object.question.answers.content;
 }
 
 function getQuestionId(url) {
@@ -66,9 +67,7 @@ $('button.js-answer-button').on('click', function (event) {
 });
 
 function getQAData(currentUrl) {
-  var Id = currentUrl.split('?')[1];
-
-  state.questionId = Id;
+  getQuestionId(currentUrl);
 
   $.ajax({
     type: 'GET',
@@ -169,7 +168,7 @@ function postQACallback(results) {
 $('form#answerQuestion').on('submit', function (event) {
   event.preventDefault();
   var currentUrl = window.location.href;
-  var qId = getQuestionId(currentUrl);
+  getQuestionId(currentUrl);
 
   var answer = $('#answerDetail').val();
   var username = 'username';
@@ -200,7 +199,6 @@ function answerQuestionCallback(data) {
 }
 
 //where should these two go in terms of organizing the code "best practice"
-
 
 function navigate(url) {
   history.pushState({}, '', url);
