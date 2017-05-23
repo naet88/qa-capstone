@@ -1,25 +1,48 @@
 /* global $ */
 
+// req --> state --> DOM render 
+
 // STEP 1: STATE
 
+// state = memory. 
+// keeping track of the page user is on. 
+// homepage state
+
+//render (state, element)
+//what does it mean when a user is on the homepage...? list of questions?
+
+/// Render functions:
+// The HTML should reflect the state. 
+// You should have a single function 
+// for each part of the page which you want to update.
+
 var state = {
-  questionTitle: '',
-  questionDetail: '',
-  username: '',
-  questionId: '',
-  likeCount: ''
+  quesPage: {
+    formSubmit: '',
+    quesTitle: '',
+    quesDetail: '',
+    username: '',
+    quesId: '',
+    likeCount: ''
+  }
+  // quesAnswDisplayPage: {}
+  // answPage: {}
+  // homePage: {}
 };
 
 // STEP 2: FUNCTIONS THAT MODIFY STATE (NO JQUERY)
 
-function updateQuestionState(object) {
-  state.questionTitle = object.question.questionTitle;
-  state.questionDetail = object.question.questionDetail;
-  state.username = object.question.username;
-  state.questionId = object.question.id;
+// the success callback should be modifying the state
+function postUpdateState(object) {
+  state.quesPage.formSubmit = true;
+  state.quesPage.quesTitle = object.question.questionTitle;
+  state.quesPage.quesDetail = object.question.questionDetail;
+  state.quesPage.username = object.question.username;
+  state.quesPage.quesId = object.question.id;
   state.likeCount = object.question.likeCount;
-  // state.answersContent = object.question.answers.content;
 }
+
+// END STEP 2
 
 function getQuestionId(url) {
   var Id = url.split('?')[1];
@@ -74,49 +97,29 @@ function getQAData(currentUrl) {
     contentType: 'application/json',
     url: '/api/questions/' + state.questionId,       
     // This success callback doesn't work if I factorize this bit (starts line 100)
-    success: function (data) {
-      $('main').find('.js-questionTitle').text(data.question.questionTitle);
-      $('main').find('.js-questionDetail').text(data.question.questionDetail);
-
-      //if this data exists -- is this correct?
-      if (data.question.answers.length > 0) {
-        console.log('there is an answer', data.question.answers.content)
-        $('main').find('.js-answerDisplay').show();
-          // I'm sure this is not the best way to do this. 
-          data.question.answers.forEach(function (item) {
-            console.log(item.content);
-            $('main').find('.js-answer-panel').append(
-              '<div class="panel-body">\
-              <p>' + item.content + '</p>\
-              <strong><p>' + item.username + '</p></strong>\
-              </div>');
-          });
-      }
+    success: getQADataCallback
     }
-  });
+  );
 }
 
-// function getQADataCallback (data) {
-//   $('main').find('.js-questionTitle').text(data.question.questionTitle);
-//   $('main').find('.js-questionDetail').text(data.question.questionDetail);
+function getQADataCallback(data) {
+  $('main').find('.js-questionTitle').text(data.question.questionTitle);
+  $('main').find('.js-questionDetail').text(data.question.questionDetail);
 
-//   //if this data exists -- is this correct?
-//   if (data.question.answers.length > 0) {
-//     console.log('there is an answer', data.question.answers.content)
-
-//     $('main').find('.js-answerDisplay').show();
-      
-//       // I'm sure this is not the best way to do this. 
-//       data.question.answers.forEach(function (item) {
-//         console.log(item.content);
-//         $('main').find('.js-answer-panel').append(
-//           '<div class="panel-body">\
-//           <p>' + item.content + '</p>\
-//           <strong><p>' + item.username + '</p></strong>\
-//           </div>');
-//       });
-//   }
-// }
+  // if this data exists
+  if (data.question.answers.length > 0) {
+    $('main').find('.js-answerDisplay').show();   
+    // DO THIS
+    // $('main').find('.js-answerDisplay').clear()
+    data.question.answers.forEach(function (item) {   
+      $('main').find('.js-answer-panel').append(
+        '<div class="panel-body">\
+        <p>' + item.content + '</p>\
+        <strong><p>' + item.username + '</p></strong>\
+        </div>');
+    });
+}
+}
 
 
 // FRONT PAGE
@@ -126,9 +129,9 @@ function getAllQuestions() {
     contentType: 'application/json',
     url: '/api/',        
     success: function (object) {
-      for (var i = 0; i <= 10; i++) {
+      var cappedQuestions = Math.min(object.questions.length, 10);
+      for (var i = 0; i < cappedQuestions; i++) {
         var qtitle = object.questions[i].questionTitle;
-        // console.log(object.questions[i].questionTitle);
         $('main').find('.js-table').append('<tr><td>' + object.questions[i].questionTitle + '</td></tr>');
       }
     }
@@ -154,15 +157,37 @@ $('form#askQuestion').on('submit', function (event) {
     type: 'POST',
     data: JSON.stringify(data),
     contentType: 'application/json',
-    url: '/api/questions',        
+    url: '/api/questions',
     // need to handle errors at some point
-    success: postQACallback
+    success: postUpdateState,
+    complete: afterPostRender
   });
 });
 
-function postQACallback(results) {
-  updateQuestionState(results);
-  navigate('http://localhost:8080/question?' + state.questionId);
+//how do I force this function to run AFTER the success callback only? 
+function afterPostRender(state, element) {
+  // navigate('http://localhost:8080/question?' + state.quesPage.quesId);
+  console.log('this is the state', state);
+  console.log('this is the state.quesPage', state.quesPage);
+  console.log('this is the state.quesPage.formSubmit', state.quesPage.quesTitle);
+  var url = 'http://localhost:8080/question?' + state.quesPage.quesId;
+
+  history.pushState({}, '', url);
+  renderPages(state, 'main');
+
+  $(element).find('.js-questionTitle').text(state.quesPage.quesTitle);
+  $(element).find('.js-questionDetail').text(state.quesPage.quesDetail);
+}
+
+
+function renderPages(state, element) {
+  if (window.location.href.match(new RegExp('^http://localhost:8080/question'))) {
+    $(element).find('.js-main-page').hide();
+    $(element).find('.js-question-page').hide();
+    $(element).find('.js-question-display-page').show();
+    $(element).find('.js-answerQuestion').hide();
+    $(element).find('.js-answerDisplay').hide();
+  }
 }
 
 $('form#answerQuestion').on('submit', function (event) {
@@ -194,7 +219,7 @@ function answerQuestionCallback(data) {
   $('main').find('form#answerQuestion').hide();
   $('main').find('.js-answerDisplay').show();
 
-  $('main').find('p.js-answer').text(data.answers.content);
+  $('main').find('p.js-answer').text(data.answers.content);//foreach 
   $('main').find('p.js-answer-username').text(data.answers.username);
 }
 
