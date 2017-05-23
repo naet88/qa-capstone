@@ -70,10 +70,7 @@ app.post('/api/questions', (req, res) => {
       return res.status(400).send(errorMessage);
     }
   }
-
-
   //if required fields are there, this executes:
-
   Question 
     .create({
       questionTitle: req.body.questionTitle,
@@ -96,7 +93,7 @@ app.put('/api/questions/:id', (req, res) => {
   //assuming ids match for now
   //force minimum word count  
   const userAnswer = req.body.answers;
-  console.log('this is the answer: ', userAnswer);
+  // console.log('this is the answer: ', userAnswer);
   Question
     .findByIdAndUpdate(req.params.id, {$push: {answers: userAnswer}}, {'new': true})
     .then(questions => {
