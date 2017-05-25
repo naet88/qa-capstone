@@ -1,144 +1,160 @@
 /* global $ */
 
-// req --> state --> DOM render 
-
-// STEP 1: STATE
-
-// state = memory. 
-// keeping track of the page user is on. 
-// homepage state
-
-//render (state, element)
-//what does it mean when a user is on the homepage...? list of questions?
-
-/// Render functions:
-// The HTML should reflect the state. 
-// You should have a single function 
-// for each part of the page which you want to update.
-
 var state = {
-  quesPage: {
-    formSubmit: '',
-    quesTitle: '',
-    quesDetail: '',
-    username: '',
-    quesId: '',
-    likeCount: ''
+
+  askQuesPage: {
+    // maybe: isQuestionPosting
+  },
+  quesDisplayPage: {
+    // hold api post state
+    // as well as the get request data
+    question: {}
+  },
+  homePage: {
+    questions: []
   }
-  // quesAnswDisplayPage: {}
-  // answPage: {}
-  // homePage: {}
 };
 
-// STEP 2: FUNCTIONS THAT MODIFY STATE (NO JQUERY)
 
-// the success callback should be modifying the state
-function postUpdateState(object) {
-  state.quesPage.formSubmit = true;
-  state.quesPage.quesTitle = object.question.questionTitle;
-  state.quesPage.quesDetail = object.question.questionDetail;
-  state.quesPage.username = object.question.username;
-  state.quesPage.quesId = object.question.id;
-  state.likeCount = object.question.likeCount;
+// STATE MODIFICATION
+
+function storeQues(quesObject) {
+  state.quesDisplayPage.question = quesObject.question;
+  console.log('This is the updated state: ', state.quesDisplayPage.question);
 }
 
-// END STEP 2
-
-function getQuestionId(url) {
-  var Id = url.split('?')[1];
-  state.questionId = Id;
-  return Id;
+function storeAllQues(quesObject) {
+  state.homePage.questions = quesObject.questions;
+  console.log('this is the homepage state', state.homePage.questions);
 }
 
-// STEP 3: RENDER IN THE DOM FUNCTIONS
-
-function renderPage() {
-  var currentUrl = window.location.href;
-
-  if (currentUrl === 'http://localhost:8080/') {
-    $('main').find('.js-main-page').show();
-    $('main').find('.js-question-display-page').hide();
-    $('main').find('.js-question-page').hide();
-    $('main').find('.js-answerQuestion').hide();
-    $('main').find('.js-answerDisplay').hide();
-
-    getAllQuestions();
-
-  } else if (currentUrl === 'http://localhost:8080/ask-question') {
-    $('main').find('.js-main-page').hide();
-    $('main').find('.js-question-page').show();
-    $('main').find('.js-question-display-page').hide();
-    $('main').find('.js-answerQuestion').hide();
-    $('main').find('.js-answerDisplay').hide();
- 
-  } else if (window.location.href.match(new RegExp('^http://localhost:8080/question'))) {
-    $('main').find('.js-main-page').hide();
-    $('main').find('.js-question-page').hide();
-    $('main').find('.js-question-display-page').show();
-    $('main').find('.js-answerQuestion').hide();
-    $('main').find('.js-answerDisplay').hide();
-
-    getQAData(currentUrl);
-  }
+function postQues(question, callback) {
+  $.ajax({
+    type: 'POST',
+    data: JSON.stringify(question),
+    contentType: 'application/json',
+    url: '/api/questions',
+    // need to handle errors at some point
+    success: function(response) {
+      storeQues(response);
+      callback(); // want to run quesRender
+    }
+  });
 }
 
-$('button.js-answer-button').on('click', function (event) {
-  event.preventDefault();
-  $('main').find('button.js-answer-button').hide();
-  $('main').find('.js-answerQuestion').show();
-  $('main').find('.js-answerDisplay').hide();
-});
+//how do i make quesRender  a callback function to run after this GET request? 
+// tried doing this but it wouldn't work.... 
+// success: function(response, quesRender) {
+//       storeQues(response);
+//       quesRender(); 
+//     }
 
-function getQAData(currentUrl) {
-  getQuestionId(currentUrl);
+function getQues(url, callback) {
+  var quesId = url.split('?')[1];
 
   $.ajax({
     type: 'GET',
     contentType: 'application/json',
-    url: '/api/questions/' + state.questionId,       
-    // This success callback doesn't work if I factorize this bit (starts line 100)
-    success: getQADataCallback
+    url: '/api/questions/' + quesId, 
+    success: function (response) {
+      storeAllQues(response);
+      callback(); // want to run homepageRender
     }
-  );
+  });
+}
+//how do I make homepageRender a callback function to run after this GET request? 
+
+
+// need an event handler that fires when at the homepage 
+function getAllQues(url, callback) {
+  $.ajax({
+    type: 'GET',
+    contentType: 'application/json',
+    url: '/api/',      
+    success: function (response) {
+      storeQues(response);
+      callback();
+    }
+  });
 }
 
-function getQADataCallback(data) {
-  $('main').find('.js-questionTitle').text(data.question.questionTitle);
-  $('main').find('.js-questionDetail').text(data.question.questionDetail);
+// RENDER IN THE DOM
 
-  // if this data exists
-  if (data.question.answers.length > 0) {
-    $('main').find('.js-answerDisplay').show();   
-    // DO THIS
+function quesRender(state, element) {
+  var url = 'http://localhost:8080/question?' + state.quesDisplayPage.question.id;
+  history.pushState({}, '', url);
+  pageRender(state, element);
+
+  $(element).find('.js-questionTitle').text(state.quesDisplayPage.question.questionTitle);
+  $(element).find('.js-questionDetail').text(state.quesDisplayPage.question.questionDetail);
+
+  if (state.quesDisplayPage.question.answers.length > 0) {
+    $(element).find('.js-answerDisplay').show();  
+    // DO something like this:
     // $('main').find('.js-answerDisplay').clear()
-    data.question.answers.forEach(function (item) {   
-      $('main').find('.js-answer-panel').append(
+    state.quesDisplayPage.question.answers.forEach(function (item) {  
+      $(element).find('.js-answer-panel').append(
         '<div class="panel-body">\
         <p>' + item.content + '</p>\
         <strong><p>' + item.username + '</p></strong>\
         </div>');
     });
-}
+  }
 }
 
+function homepageRender(state, element) {
+  var cappedQuestions = Math.min(state.homePage.questions.length, 10);
+  for (var i = 0; i < cappedQuestions; i++) {
+    $(element).find('js-question-table').append(
+      '<tbody>\
+        <tr>\
+          <td>' + state.homepage.questions[i].questionTitle + 'Likes </td>\
+          <td>' + state.homepage.questions[i].questionTitle + 'Answers</td>\
+          <td><a href="http://localhost:8080/question?' + state.homepage.questions[i].id + '">' + state.homepage.questions[i].questionTitle +
+          '</a></td>\
+        </tr>\
+      </tbody>');
+  }
+}
 
-// FRONT PAGE
-function getAllQuestions() {
-  $.ajax({
-    type: 'GET',
-    contentType: 'application/json',
-    url: '/api/',        
-    success: function (object) {
-      var cappedQuestions = Math.min(object.questions.length, 10);
-      for (var i = 0; i < cappedQuestions; i++) {
-        var qtitle = object.questions[i].questionTitle;
-        $('main').find('.js-table').append('<tr><td>' + object.questions[i].questionTitle + '</td></tr>');
-      }
-    }
-  });
+function answerRender(state, element) {
+  $(element).find('button.js-answer-button').hide();
+  $(element).find('.js-answerQuestion').show();
+  $(element).find('.js-answerDisplay').hide();
+}
+
+// Is there a way to make this shorter?
+function pageRender(state, element) {
+  var currentUrl = window.location.href;
+
+  if (currentUrl === 'http://localhost:8080/') {
+    element.find('.js-main-page').show();
+    element.find('.js-question-display-page').hide();
+    element.find('.js-question-page').hide();
+    element.find('.js-answerQuestion').hide();
+    element.find('.js-answerDisplay').hide();
+
+    //I DON'T THINK THIS IS THE BEST PLACE FOR THIS 
+    getAllQues(currentUrl);
+
+  } else if (currentUrl === 'http://localhost:8080/ask-question') {
+    element.find('.js-main-page').hide();
+    element.find('.js-question-page').show();
+    element.find('.js-question-display-page').hide();
+    element.find('.js-answerQuestion').hide();
+    element.find('.js-answerDisplay').hide();
+ 
+  } else if (window.location.href.match(new RegExp('^http://localhost:8080/question'))) {
+    element.find('.js-main-page').hide();
+    element.find('.js-question-page').hide();
+    element.find('.js-question-display-page').show();
+    element.find('.js-answerQuestion').hide();
+    element.find('.js-answerDisplay').hide();
+  }
 }
 
 // STEP 4: JQUERY EVENT LISTENERS
+// Is there a function that is an "event listener for new browser url"
 
 $('form#askQuestion').on('submit', function (event) {
   event.preventDefault();
@@ -152,85 +168,18 @@ $('form#askQuestion').on('submit', function (event) {
     questionDetail: questionDetail,
     questionLikeCount: 0
   };
-
-  $.ajax({
-    type: 'POST',
-    data: JSON.stringify(data),
-    contentType: 'application/json',
-    url: '/api/questions',
-    // need to handle errors at some point
-    success: postUpdateState,
-    complete: afterPostRender
-  });
-});
-
-//how do I force this function to run AFTER the success callback only? 
-function afterPostRender(state, element) {
-  // navigate('http://localhost:8080/question?' + state.quesPage.quesId);
-  console.log('this is the state', state);
-  console.log('this is the state.quesPage', state.quesPage);
-  console.log('this is the state.quesPage.formSubmit', state.quesPage.quesTitle);
-  var url = 'http://localhost:8080/question?' + state.quesPage.quesId;
-
-  history.pushState({}, '', url);
-  renderPages(state, 'main');
-
-  $(element).find('.js-questionTitle').text(state.quesPage.quesTitle);
-  $(element).find('.js-questionDetail').text(state.quesPage.quesDetail);
-}
-
-
-function renderPages(state, element) {
-  if (window.location.href.match(new RegExp('^http://localhost:8080/question'))) {
-    $(element).find('.js-main-page').hide();
-    $(element).find('.js-question-page').hide();
-    $(element).find('.js-question-display-page').show();
-    $(element).find('.js-answerQuestion').hide();
-    $(element).find('.js-answerDisplay').hide();
+  //can we talk about how this is working?
+  postQues(data, function () {
+    quesRender(state, $('main'));
   }
-}
-
-$('form#answerQuestion').on('submit', function (event) {
-  event.preventDefault();
-  var currentUrl = window.location.href;
-  getQuestionId(currentUrl);
-
-  var answer = $('#answerDetail').val();
-  var username = 'username';
-
-  var data = {
-        answers: {
-          content: answer,
-          likeCount: 0,
-          username: username
-        }
-  };
-
-  $.ajax({
-    type: 'PUT',
-    data: JSON.stringify(data),
-    contentType: 'application/json',
-    url: '/api/questions/' + state.questionId,
-    success: answerQuestionCallback
-  });
+  );
 });
 
-function answerQuestionCallback(data) {
-  $('main').find('form#answerQuestion').hide();
-  $('main').find('.js-answerDisplay').show();
-
-  $('main').find('p.js-answer').text(data.answers.content);//foreach 
-  $('main').find('p.js-answer-username').text(data.answers.username);
-}
-
-//where should these two go in terms of organizing the code "best practice"
-
-function navigate(url) {
-  history.pushState({}, '', url);
-  renderPage();
-}
+$('button.js-answer-button').on('click', function (event) {
+  event.preventDefault();
+  answerRender(state, $('main'));
+});
 
 // INITIALIZE APP
 
-renderPage();
-
+pageRender(state, $('main'));

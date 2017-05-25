@@ -1,5 +1,25 @@
 mongoimport --db qa-app --collection questions --drop --file ~/Desktop/projects/qa-capstone-seed-data.json
 
+Notes:
+
+// req --> state --> DOM render 
+
+// STEP 1: STATE
+
+// state = memory. 
+// keeping track of the page user is on. 
+// homepage state
+
+//render (state, element)
+//what does it mean when a user is on the homepage...? list of questions?
+
+/// Render functions:
+// The HTML should reflect the state. 
+// You should have a single function 
+// for each part of the page which you want to update.
+
+
+
 //
 //Ask Question Page// 
 //
