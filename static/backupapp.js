@@ -17,45 +17,27 @@
 // for each part of the page which you want to update.
 
 var state = {
-  homePage: {}
-  questionPage: {}
-  QADisplayPage: {}
-  answerPage: {}
-   
-
-  shownQuestion: {
-    questionTitle: '',
-    questionDetail: '',
-    username: '',
-    questionId: '',
-    likeCount: ''
-    },
-  answer: {
-
+  askQuesPage: {
+    // maybe: isQuestionPosting
+  },
+  quesDisplayPage: {
+    // hold api post state
+    // as well as the get request data
+    question: {}
+  },
+  homePage: {
+    questions: []
   }
 };
 
 // STEP 2: FUNCTIONS THAT MODIFY STATE (NO JQUERY)
 
-//the success callback should be modifying the state
-function postQCallback(results) {
-  updateQuestionState(results);
-  navigate('http://localhost:8080/question?' + state.questionId);
+// the success callback should be modifying the state
+function storeQuesData(quesObject) {
+  state.quesDisplayPage.question = quesObject;
 }
-
-
-
 
 // END STEP 2
-
-function updateQuestionState(object) {
-  state.questionTitle = object.question.questionTitle;
-  state.questionDetail = object.question.questionDetail;
-  state.username = object.question.username;
-  state.questionId = object.question.id;
-  state.likeCount = object.question.likeCount;
-  // state.answersContent = object.question.answers.content;
-}
 
 function getQuestionId(url) {
   var Id = url.split('?')[1];
@@ -170,13 +152,38 @@ $('form#askQuestion').on('submit', function (event) {
     type: 'POST',
     data: JSON.stringify(data),
     contentType: 'application/json',
-    url: '/api/questions',        
+    url: '/api/questions',
     // need to handle errors at some point
-    success: postQCallback
+    success: postUpdateState,
+    complete: afterPostRender
   });
 });
 
+//how do I force this function to run AFTER the success callback only? 
+function afterPostRender(state, element) {
+  // navigate('http://localhost:8080/question?' + state.quesPage.quesId);
+  console.log('this is the state', state);
+  console.log('this is the state.quesPage', state.quesPage);
+  console.log('this is the state.quesPage.formSubmit', state.quesPage.quesTitle);
+  var url = 'http://localhost:8080/question?' + state.quesPage.quesId;
 
+  history.pushState({}, '', url);
+  renderPages(state, 'main');
+
+  $(element).find('.js-questionTitle').text(state.quesPage.quesTitle);
+  $(element).find('.js-questionDetail').text(state.quesPage.quesDetail);
+}
+
+
+function renderPages(state, element) {
+  if (window.location.href.match(new RegExp('^http://localhost:8080/question'))) {
+    $(element).find('.js-main-page').hide();
+    $(element).find('.js-question-page').hide();
+    $(element).find('.js-question-display-page').show();
+    $(element).find('.js-answerQuestion').hide();
+    $(element).find('.js-answerDisplay').hide();
+  }
+}
 
 $('form#answerQuestion').on('submit', function (event) {
   event.preventDefault();

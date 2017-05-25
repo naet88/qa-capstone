@@ -36,13 +36,13 @@ function postQues(question, callback) {
     url: '/api/questions',
     // need to handle errors at some point
     success: function(response) {
-      storeQues(response);
-      callback(); // want to run quesRender
+      callback(response); // want to run quesRender
+    // success: callback (apparently the same thing)
     }
   });
 }
 
-//how do i make quesRender  a callback function to run after this GET request? 
+// how do i make quesRender  a callback function to run after this GET request? 
 // tried doing this but it wouldn't work.... 
 // success: function(response, quesRender) {
 //       storeQues(response);
@@ -62,10 +62,9 @@ function getQues(url, callback) {
     }
   });
 }
-//how do I make homepageRender a callback function to run after this GET request? 
+// how do I make homepageRender a callback function to run after this GET request?
 
-
-// need an event handler that fires when at the homepage 
+// need an event handler that fires when at the homepage
 function getAllQues(url, callback) {
   $.ajax({
     type: 'GET',
@@ -168,11 +167,13 @@ $('form#askQuestion').on('submit', function (event) {
     questionDetail: questionDetail,
     questionLikeCount: 0
   };
-  //can we talk about how this is working?
-  postQues(data, function () {
+
+  function postQuesCallback(postedQuestion) {
+    storeQues(postedQuestion);
     quesRender(state, $('main'));
   }
-  );
+
+  postQues(data, postQuesCallback);
 });
 
 $('button.js-answer-button').on('click', function (event) {
