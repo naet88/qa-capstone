@@ -58,10 +58,7 @@ function getQues(url, callback) {
     type: 'GET',
     contentType: 'application/json',
     url: '/api/questions/' + quesId, 
-    success: function (response) {
-      storeAllQues(response);
-      callback(); // want to run homepageRender
-    }
+    success: callback
   });
 }
 // how do I make homepageRender a callback function to run after this GET request?
@@ -79,9 +76,15 @@ function getAllQues(callback) {
 // RENDER IN THE DOM
 
 function quesRender(state, element) {
-  var url = 'http://localhost:8080/question?' + state.quesDisplayPage.question.id;
-  history.pushState({}, '', url);
-  pageRender(state, element);
+  element.find('.js-main-page').hide();
+  element.find('.js-question-page').hide();
+  element.find('.js-question-display-page').show();
+  element.find('.js-answerQuestion').hide();
+  element.find('.js-answerDisplay').hide(); 
+
+  // var url = 'http://localhost:8080/question?' + state.quesDisplayPage.question.id;
+  // history.pushState({}, '', url);
+  // handlePage(state, element);
 
   $(element).find('.js-questionTitle').text(state.quesDisplayPage.question.questionTitle);
   $(element).find('.js-questionDetail').text(state.quesDisplayPage.question.questionDetail);
@@ -121,13 +124,21 @@ function homepageRender(state, element) {
   }
 }
 
+//LOOK UP ELEMENT $
 function answerRender(state, element) {
   $(element).find('button.js-answer-button').hide();
   $(element).find('.js-answerQuestion').show();
   $(element).find('.js-answerDisplay').hide();
 }
 
-// Is there a way to make this shorter?
+function askQuesRender(state, element) {
+  $(element).find('.js-main-page').hide();
+  $(element).find('.js-question-page').show();
+  $(element).find('.js-question-display-page').hide();
+  $(element).find('.js-answerQuestion').hide();
+  $(element).find('.js-answerDisplay').hide();
+}
+
 function handlePage(state, element) {
   var currentUrl = window.location.href;
 
@@ -141,18 +152,18 @@ function handlePage(state, element) {
     getAllQues(getAllQuesCallback);
 
   } else if (currentUrl === 'http://localhost:8080/ask-question') {
-    element.find('.js-main-page').hide();
-    element.find('.js-question-page').show();
-    element.find('.js-question-display-page').hide();
-    element.find('.js-answerQuestion').hide();
-    element.find('.js-answerDisplay').hide();
+    
+    askQuesRender(state, element);
  
   } else if (window.location.href.match(new RegExp('^http://localhost:8080/question'))) {
-    element.find('.js-main-page').hide();
-    element.find('.js-question-page').hide();
-    element.find('.js-question-display-page').show();
-    element.find('.js-answerQuestion').hide();
-    element.find('.js-answerDisplay').hide();
+    
+    function quesQuesCallback(ques) {
+      storeQues(ques);
+      quesRender(state, element);
+    }
+
+    getQues(currentUrl, quesQuesCallback); 
+    
   }
 }
 
