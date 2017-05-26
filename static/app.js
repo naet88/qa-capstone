@@ -35,8 +35,10 @@ function postQues(question, callback) {
     contentType: 'application/json',
     url: '/api/questions',
     // need to handle errors at some point
-    success: function(response) {
-      callback(response); // want to run quesRender
+    success: callback
+
+    // function(response) {
+    //   callback(response); // want to run quesRender
     // success: callback (apparently the same thing)
     }
   });
@@ -65,15 +67,12 @@ function getQues(url, callback) {
 // how do I make homepageRender a callback function to run after this GET request?
 
 // need an event handler that fires when at the homepage
-function getAllQues(url, callback) {
+function getAllQues(callback) {
   $.ajax({
     type: 'GET',
     contentType: 'application/json',
     url: '/api/',      
-    success: function (response) {
-      storeQues(response);
-      callback();
-    }
+    success: callback
   });
 }
 
@@ -102,6 +101,12 @@ function quesRender(state, element) {
 }
 
 function homepageRender(state, element) {
+    element.find('.js-main-page').show();
+    element.find('.js-question-display-page').hide();
+    element.find('.js-question-page').hide();
+    element.find('.js-answerQuestion').hide();
+    element.find('.js-answerDisplay').hide();
+
   var cappedQuestions = Math.min(state.homePage.questions.length, 10);
   for (var i = 0; i < cappedQuestions; i++) {
     $(element).find('js-question-table').append(
@@ -123,18 +128,17 @@ function answerRender(state, element) {
 }
 
 // Is there a way to make this shorter?
-function pageRender(state, element) {
+function handlePage(state, element) {
   var currentUrl = window.location.href;
 
   if (currentUrl === 'http://localhost:8080/') {
-    element.find('.js-main-page').show();
-    element.find('.js-question-display-page').hide();
-    element.find('.js-question-page').hide();
-    element.find('.js-answerQuestion').hide();
-    element.find('.js-answerDisplay').hide();
+    // store the qs from get request to state
+    function getAllQuesCallback(allQues) {
+      storeAllQues(allQues);
+      homepageRender(state, element);
+    }
 
-    //I DON'T THINK THIS IS THE BEST PLACE FOR THIS 
-    getAllQues(currentUrl);
+    getAllQues(getAllQuesCallback);
 
   } else if (currentUrl === 'http://localhost:8080/ask-question') {
     element.find('.js-main-page').hide();
@@ -183,4 +187,11 @@ $('button.js-answer-button').on('click', function (event) {
 
 // INITIALIZE APP
 
-pageRender(state, $('main'));
+handlePage(state, $('main'));
+
+// function navigate(url) {
+//   history.pushState({}, '', url);
+//   renderPage();
+// }
+
+
