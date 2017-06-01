@@ -5,7 +5,8 @@ const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
 const {PORT, DATABASE_URL} = require('./config');
-const {Question} = require('./models');
+const {Question} = require('./models/question');
+const {User} = require('./models/user');
 
 const app = express();
 
@@ -26,7 +27,28 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // Begin CRUD operations - QUESTIONS
 
-app.get('/api/', (req, res) => {
+app.get('/api/users', (req, res) => {
+  User
+    .find()
+    .exec()
+    .then(users => {
+      res.json({
+        users: users.map(user => {return user.apiRepr();})
+      })
+    })
+
+    .catch(
+      err => {
+        console.error(err);
+        return res.status(500).json({message: 'Internal server error'});
+      });
+});
+
+// app.post('/api/users', (req, res) => {
+//   User
+// })
+
+app.get('/api/questions', (req, res) => {
   Question
     .find()
     .exec()
