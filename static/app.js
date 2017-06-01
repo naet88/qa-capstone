@@ -1,5 +1,7 @@
 /* global $ */
 
+// need to handle errors in ajax calls at some point
+
 var state = {
 
   askQuesPage: {
@@ -15,17 +17,16 @@ var state = {
   }
 };
 
-
-// STATE MODIFICATION
+// STATE MODIFICATION (API requests modify state only )
 
 function storeQues(quesObject) {
   state.quesDisplayPage.question = quesObject.question;
-  console.log('This is the updated state: ', state.quesDisplayPage.question);
+  // console.log('This is the updated state: ', state.quesDisplayPage.question);
 }
 
 function storeAllQues(quesObject) {
   state.homePage.questions = quesObject.questions;
-  console.log('this is the homepage state', state.homePage.questions);
+  // console.log('this is state.homePage', state.homePage);
 }
 
 function postQues(question, callback) {
@@ -34,26 +35,12 @@ function postQues(question, callback) {
     data: JSON.stringify(question),
     contentType: 'application/json',
     url: '/api/questions',
-    // need to handle errors at some point
     success: callback
-
-    // function(response) {
-    //   callback(response); // want to run quesRender
-    // success: callback (apparently the same thing)
-    }
   });
 }
 
-// how do i make quesRender  a callback function to run after this GET request? 
-// tried doing this but it wouldn't work.... 
-// success: function(response, quesRender) {
-//       storeQues(response);
-//       quesRender(); 
-//     }
-
-function getQues(url, callback) {
-  var quesId = url.split('?')[1];
-
+function getQues(quesId, callback) {
+  
   $.ajax({
     type: 'GET',
     contentType: 'application/json',
@@ -61,9 +48,7 @@ function getQues(url, callback) {
     success: callback
   });
 }
-// how do I make homepageRender a callback function to run after this GET request?
 
-// need an event handler that fires when at the homepage
 function getAllQues(callback) {
   $.ajax({
     type: 'GET',
@@ -73,58 +58,71 @@ function getAllQues(callback) {
   });
 }
 
+function updateQues(question, quesId, callback) {
+  $.ajax({
+    type: 'PUT',
+    data: JSON.stringify(question),
+    contentType: 'application/json',
+    url: '/api/questions/' + quesId,
+    success: callback
+  });
+}
+
 // RENDER IN THE DOM
 
 function quesRender(state, element) {
-  element.find('.js-main-page').hide();
-  element.find('.js-question-page').hide();
-  element.find('.js-question-display-page').show();
-  element.find('.js-answerQuestion').hide();
-  element.find('.js-answerDisplay').hide(); 
-
-  // var url = 'http://localhost:8080/question?' + state.quesDisplayPage.question.id;
-  // history.pushState({}, '', url);
-  // handlePage(state, element);
+  $(element).find('.js-main-page').hide();
+  $(element).find('.js-question-page').hide();
+  $(element).find('.js-question-display-page').show();
+  $(element).find('.js-answerQuestion').hide();
+  $(element).find('.js-answerDisplay').hide();
 
   $(element).find('.js-questionTitle').text(state.quesDisplayPage.question.questionTitle);
   $(element).find('.js-questionDetail').text(state.quesDisplayPage.question.questionDetail);
 
+  //works if there are answers
   if (state.quesDisplayPage.question.answers.length > 0) {
-    $(element).find('.js-answerDisplay').show();  
-    // DO something like this:
-    // $('main').find('.js-answerDisplay').clear()
-    state.quesDisplayPage.question.answers.forEach(function (item) {  
+    $(element).find('.js-answerDisplay').show();
+
+    state.quesDisplayPage.question.answers.forEach(function (item) {
       $(element).find('.js-answer-panel').append(
-        '<div class="panel-body">\
-        <p>' + item.content + '</p>\
-        <strong><p>' + item.username + '</p></strong>\
-        </div>');
+          "<div class='panel panel-default'>\
+            <div class='panel-body'>\
+              <p>" + item.content + "</p>\
+              <strong><p>Says: " + item.username + "</p></strong>\
+            </div>\
+          </div>");
     });
   }
 }
 
 function homepageRender(state, element) {
-    element.find('.js-main-page').show();
-    element.find('.js-question-display-page').hide();
-    element.find('.js-question-page').hide();
-    element.find('.js-answerQuestion').hide();
-    element.find('.js-answerDisplay').hide();
+  $(element).find('.js-main-page').show();
+  $(element).find('.js-question-display-page').hide();
+  $(element).find('.js-question-page').hide();
+  $(element).find('.js-answerQuestion').hide();
+  $(element).find('.js-answerDisplay').hide();
 
   var cappedQuestions = Math.min(state.homePage.questions.length, 10);
+
+  //I want to order by the highest number of likes first.
+  //Also, I don't think hardcoding href=localhost is a good idea.  
   for (var i = 0; i < cappedQuestions; i++) {
-    $(element).find('js-question-table').append(
-      '<tbody>\
-        <tr>\
-          <td>' + state.homepage.questions[i].questionTitle + 'Likes </td>\
-          <td>' + state.homepage.questions[i].questionTitle + 'Answers</td>\
-          <td><a href="http://localhost:8080/question?' + state.homepage.questions[i].id + '">' + state.homepage.questions[i].questionTitle +
-          '</a></td>\
-        </tr>\
-      </tbody>');
+    var quesTitle = state.homePage.questions[i].questionTitle; 
+    var likeCount = state.homePage.questions[i].likeCount;
+    var quesID = state.homePage.questions[i].id;
+    $(element).find('.js-question-table').append("<tbody>\
+      <tr>\
+      <td><a href='http://localhost:8080/question?" + quesID + "'>"
+      + quesTitle + "</a>\
+      </td>\
+      <td>"
+       + likeCount + " Likes </td>\
+      </tr>\
+      </tbody>");
   }
 }
 
-//LOOK UP ELEMENT $
 function answerRender(state, element) {
   $(element).find('button.js-answer-button').hide();
   $(element).find('.js-answerQuestion').show();
@@ -139,11 +137,13 @@ function askQuesRender(state, element) {
   $(element).find('.js-answerDisplay').hide();
 }
 
+// STEP 4: JQUERY EVENT LISTENERS
+
 function handlePage(state, element) {
   var currentUrl = window.location.href;
 
   if (currentUrl === 'http://localhost:8080/') {
-    // store the qs from get request to state
+    
     function getAllQuesCallback(allQues) {
       storeAllQues(allQues);
       homepageRender(state, element);
@@ -162,13 +162,10 @@ function handlePage(state, element) {
       quesRender(state, element);
     }
 
-    getQues(currentUrl, quesQuesCallback); 
+    getQues(extractQuesId(currentUrl), quesQuesCallback);
     
   }
 }
-
-// STEP 4: JQUERY EVENT LISTENERS
-// Is there a function that is an "event listener for new browser url"
 
 $('form#askQuestion').on('submit', function (event) {
   event.preventDefault();
@@ -185,6 +182,7 @@ $('form#askQuestion').on('submit', function (event) {
 
   function postQuesCallback(postedQuestion) {
     storeQues(postedQuestion);
+    pushState();
     quesRender(state, $('main'));
   }
 
@@ -196,13 +194,44 @@ $('button.js-answer-button').on('click', function (event) {
   answerRender(state, $('main'));
 });
 
+$('form#answerQuestion').on('submit', function (event) {
+  event.preventDefault();
+  var currentUrl = window.location.href;
+  // extractQuesId(currentUrl);
+
+  var answer = $('#answerDetail').val();
+  var username = 'username';
+
+  var data = {
+    answers: {
+      content: answer,
+      likeCount: 0,
+      username: username
+    }
+  };
+
+  function updateQuesCallback(updatedObject) {
+    storeQues(updatedObject);
+    quesRender(state, $('main'));
+  }
+
+  updateQues(data, extractQuesId(currentUrl), updateQuesCallback);
+});
+
+// not sure where to put this!
+function pushState() {
+  var qId = state.quesDisplayPage.question.id;
+  var url = 'http://localhost:8080/question?' + qId;
+  history.pushState({}, '', url);
+  handlePage(state, $('main'));
+}
+
+function extractQuesId(url) {
+  return url.split('?')[1];  
+}
+
 // INITIALIZE APP
 
 handlePage(state, $('main'));
-
-// function navigate(url) {
-//   history.pushState({}, '', url);
-//   renderPage();
-// }
 
 
