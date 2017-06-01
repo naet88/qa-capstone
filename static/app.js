@@ -2,6 +2,14 @@
 
 // need to handle errors in ajax calls at some point
 
+// UTILITY FUNCTIONS
+var appOrigin = 'http://localhost:8080';
+
+function appUrl(path) {
+  return appOrigin + path;
+}
+
+// STATE
 var state = {
 
   askQuesPage: {
@@ -80,7 +88,8 @@ function quesRender(state, element) {
   $(element).find('.js-questionTitle').text(state.quesDisplayPage.question.questionTitle);
   $(element).find('.js-questionDetail').text(state.quesDisplayPage.question.questionDetail);
 
-  //works if there are answers
+  // works if there are answers
+  // appending is the issue
   if (state.quesDisplayPage.question.answers.length > 0) {
     $(element).find('.js-answerDisplay').show();
 
@@ -105,10 +114,12 @@ function homepageRender(state, element) {
 
   var cappedQuestions = Math.min(state.homePage.questions.length, 10);
 
-  //I want to order by the highest number of likes first.
-  //Also, I don't think hardcoding href=localhost is a good idea.  
+  // I want to order by the highest number of likes first.
+  // Also, I don't think hardcoding href=localhost is a good idea.
+  // Lodash?
+  // Best Practice: Server-side. Limit 10 and sort
   for (var i = 0; i < cappedQuestions; i++) {
-    var quesTitle = state.homePage.questions[i].questionTitle; 
+    var quesTitle = state.homePage.questions[i].questionTitle;
     var likeCount = state.homePage.questions[i].likeCount;
     var quesID = state.homePage.questions[i].id;
     $(element).find('.js-question-table').append("<tbody>\

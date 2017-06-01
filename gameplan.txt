@@ -1,3 +1,7 @@
+USER AUTH (PASSPORT)
+https://github.com/jaredhanson/passport-http
+
+
 mongoimport --db qa-app --collection questions --drop --file ~/Desktop/projects/qa-capstone-seed-data.json
 
 Notes:
