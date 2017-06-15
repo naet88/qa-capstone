@@ -1,6 +1,8 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const mongoose = require('mongoose');
+//is this even right...
+const {router: usersRouter} = require('./users/router');
 
 mongoose.Promise = global.Promise;
 
@@ -24,29 +26,52 @@ app.use(express.static('static'));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+//is this even right...
+app.use('/users/', usersRouter);
 
 // Begin CRUD operations - QUESTIONS
 
-app.get('/api/users', (req, res) => {
-  User
-    .find()
-    .exec()
-    .then(users => {
-      res.json({
-        users: users.map(user => {return user.apiRepr();})
-      })
-    })
+// app.get('/api/users', (req, res) => {
+//   User
+//     .find()
+//     .exec()
+//     .then(users => {
+//       res.json({
+//         users: users.map(user => {return user.apiRepr();})
+//       })
+//     })
 
-    .catch(
-      err => {
-        console.error(err);
-        return res.status(500).json({message: 'Internal server error'});
-      });
-});
+//     .catch(
+//       err => {
+//         console.error(err);
+//         return res.status(500).json({message: 'Internal server error'});
+//       });
+// });
+
+// //bcrypt.hash("B4c0/\/", salt, function(err, hash) {
+//         // Store hash in your password DB.
+//     // });
+//     //https://github.com/dcodeIO/bcrypt.js#hashs-salt-callback-progresscallback
 
 // app.post('/api/users', (req, res) => {
 //   User
-// })
+//     .create({
+//       firstName: req.body.firstname,
+//       lastName: req.body.lastname,
+//       username: req.body.username,
+//       password: 
+//     })
+//     .then(newUser => {
+//       res.json({
+//         user: newUser.apiRepr()
+//       })
+//     })
+//     .catch(
+//       err => {
+//         console.error(err);
+//         return res.status(500).json({message: 'Internal server error'});
+//       });
+// });
 
 app.get('/api/questions', (req, res) => {
   Question

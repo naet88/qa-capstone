@@ -89,7 +89,7 @@ function quesRender(state, element) {
   $(element).find('.js-questionDetail').text(state.quesDisplayPage.question.questionDetail);
 
   // works if there are answers
-  // appending is the issue
+  // appending is the issue  
   if (state.quesDisplayPage.question.answers.length > 0) {
     $(element).find('.js-answerDisplay').show();
 

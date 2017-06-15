@@ -1,4 +1,7 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+
+mongoose.Promise = global.Promise;
 
 const userSchema = mongoose.Schema({
 	firstName: {type: String},
@@ -14,6 +17,22 @@ userSchema.methods.apiRepr = function() {
 		lastName: this.lastName,
 		username: this.username,
 	};
+}
+
+UserSchema.methods.validatePassword = function(password) {
+  return bcrypt
+    .compare(password, this.password)
+    .then(isValid => isValid);
+}
+
+// userSchema.statics.hashPassword = function(password) {
+//   return bcrypt.hash(password, 10);
+// }
+
+UserSchema.statics.hashPassword = function(password) {
+  return bcrypt
+    .hash(password, 10);
+    // .then(hash => hash);
 }
 
 const User = mongoose.model('User', userSchema);
