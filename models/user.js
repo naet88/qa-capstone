@@ -19,7 +19,7 @@ userSchema.methods.apiRepr = function() {
 	};
 }
 
-UserSchema.methods.validatePassword = function(password) {
+userSchema.methods.validatePassword = function(password) {
   return bcrypt
     .compare(password, this.password)
     .then(isValid => isValid);
@@ -29,7 +29,7 @@ UserSchema.methods.validatePassword = function(password) {
 //   return bcrypt.hash(password, 10);
 // }
 
-UserSchema.statics.hashPassword = function(password) {
+userSchema.statics.hashPassword = function(password) {
   return bcrypt
     .hash(password, 10);
     // .then(hash => hash);
