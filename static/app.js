@@ -74,6 +74,27 @@ function updateQues(question, quesId, callback) {
   });
 }
 
+// USER LOGIN: Very precarious and very possibly incorrect. 
+function userLogin(user, callback) {
+  $.ajax({
+    type: 'GET',
+    contentType: 'application/json',
+    url: '/me',
+    success: callback
+  });
+}
+
+// USER CREATION: Also very precarious and very possibly incorrect. 
+function createUser(newUser, callback) {
+  $.ajax({
+    type: 'POST',
+    data: JSON.stringify(newUser),
+    contentType: 'application/json',
+    url: '/api/users',
+    success: callback
+  });
+}
+
 // RENDER IN THE DOM
 
 function quesRender(state, element) {
@@ -220,17 +241,41 @@ $('form#answerQuestion').on('submit', function (event) {
 });
 
 $('.js-signup').on('click', function (event) {
-  // event.preventDefault();
+  console.log(event);
+  $('form#login-form').hide();
+});
+
+$('.js-login').on('click', function (event) {
   console.log(event);
   $('form#register-form').hide();
 });
 
-$('.js-login').on('click', function (event) {
-  // event.preventDefault();
-  console.log(event);
-  $('form#register-form').hide();
-  
+$('form#login-form').on('submit', function (event) {
+  event.preventDefault();
+  // User Auth runs somehow
 });
+
+$('form#register-form').on('submit', function (event) {
+  event.preventDefault();
+  
+  var username = $('#username').val();
+  var password = $('#password').val();
+  var passwordConfirm = $('#confirm-password').val();
+
+  if (password !== passwordConfirm) {
+    //show the DOM element for passwords  not matching 
+  }
+
+  var data = {
+    username: username,
+    password: password //needs to be hashed?
+  };
+
+  createUser(data, function(object) {
+    console.log(object);
+  });
+});
+
 // UTILITY FUNCTIONS
 
 function pushState() {
