@@ -220,17 +220,16 @@ $('form#answerQuestion').on('submit', function (event) {
 });
 
 $('.js-signup').on('click', function (event) {
-  // show create account
+  // event.preventDefault();
   console.log(event);
-  $('ul.nav').hide();
-  // $('form#register-form').css("display", "none");
+  $('form#register-form').hide();
 });
 
 $('.js-login').on('click', function (event) {
-   // show create account
+  // event.preventDefault();
   console.log(event);
-  $('ul.nav').hide();
-  // $('form#register-form').css("display", "none");
+  $('form#register-form').hide();
+  
 });
 // UTILITY FUNCTIONS
 
