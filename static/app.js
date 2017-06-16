@@ -13,7 +13,6 @@ function appUrl(path) {
 var state = {
 
   askQuesPage: {
-    // maybe: isQuestionPosting
   },
   quesDisplayPage: {
     // hold api post state
@@ -223,14 +222,15 @@ $('form#answerQuestion').on('submit', function (event) {
 $('.js-signup').on('click', function (event) {
   // show create account
   console.log(event);
-  // $('main').find('form#register-form').hide();
-  $('form#register-form').css("display", "none");
+  $('ul.nav').hide();
+  // $('form#register-form').css("display", "none");
 });
 
 $('.js-login').on('click', function (event) {
    // show create account
   console.log(event);
-  $('form#register-form').css("display", "none");
+  $('ul.nav').hide();
+  // $('form#register-form').css("display", "none");
 });
 // UTILITY FUNCTIONS
 
