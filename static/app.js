@@ -48,11 +48,10 @@ function postQues(question, callback) {
 }
 
 function getQues(quesId, callback) {
-  
   $.ajax({
     type: 'GET',
     contentType: 'application/json',
-    url: '/api/questions/' + quesId, 
+    url: '/api/questions/' + quesId,
     success: callback
   });
 }
@@ -61,7 +60,7 @@ function getAllQues(callback) {
   $.ajax({
     type: 'GET',
     contentType: 'application/json',
-    url: '/api/',      
+    url: '/api/questions',
     success: callback
   });
 }
@@ -89,7 +88,7 @@ function quesRender(state, element) {
   $(element).find('.js-questionDetail').text(state.quesDisplayPage.question.questionDetail);
 
   // works if there are answers
-  // appending is the issue  
+  // appending is the issue 
   if (state.quesDisplayPage.question.answers.length > 0) {
     $(element).find('.js-answerDisplay').show();
 
@@ -154,27 +153,20 @@ function handlePage(state, element) {
   var currentUrl = window.location.href;
 
   if (currentUrl === 'http://localhost:8080/') {
-    
     function getAllQuesCallback(allQues) {
       storeAllQues(allQues);
       homepageRender(state, element);
     }
-
     getAllQues(getAllQuesCallback);
-
   } else if (currentUrl === 'http://localhost:8080/ask-question') {
-    
     askQuesRender(state, element);
- 
   } else if (window.location.href.match(new RegExp('^http://localhost:8080/question'))) {
-    
     function quesQuesCallback(ques) {
       storeQues(ques);
       quesRender(state, element);
     }
 
     getQues(extractQuesId(currentUrl), quesQuesCallback);
-    
   }
 }
 
@@ -208,7 +200,6 @@ $('button.js-answer-button').on('click', function (event) {
 $('form#answerQuestion').on('submit', function (event) {
   event.preventDefault();
   var currentUrl = window.location.href;
-  // extractQuesId(currentUrl);
 
   var answer = $('#answerDetail').val();
   var username = 'username';
@@ -229,7 +220,20 @@ $('form#answerQuestion').on('submit', function (event) {
   updateQues(data, extractQuesId(currentUrl), updateQuesCallback);
 });
 
-// not sure where to put this!
+$('.js-signup').on('click', function (event) {
+  // show create account
+  console.log(event);
+  // $('main').find('form#register-form').hide();
+  $('form#register-form').css("display", "none");
+});
+
+$('.js-login').on('click', function (event) {
+   // show create account
+  console.log(event);
+  $('form#register-form').css("display", "none");
+});
+// UTILITY FUNCTIONS
+
 function pushState() {
   var qId = state.quesDisplayPage.question.id;
   var url = 'http://localhost:8080/question?' + qId;
@@ -238,11 +242,9 @@ function pushState() {
 }
 
 function extractQuesId(url) {
-  return url.split('?')[1];  
+  return url.split('?')[1];
 }
 
 // INITIALIZE APP
 
 handlePage(state, $('main'));
-
-

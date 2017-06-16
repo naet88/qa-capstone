@@ -1,9 +1,9 @@
-const {BasicStrategy} = require('passport-http');
+const { BasicStrategy } = require('passport-http');
 const express = require('express');
 const jsonParser = require('body-parser').json();
 const passport = require('passport');
 
-const {User} = require('../models/user');
+const { User } = require('../models/user');
 
 const router = express.Router();
 
@@ -13,12 +13,12 @@ router.use(jsonParser);
 const strategy = new BasicStrategy(
   (username, password, cb) => {
     User
-      .findOne({username})
+      .findOne({ username })
       .exec()
       .then(user => {
         if (!user) {
           return cb(null, false, {
-            message: 'Incorrect username'
+            message: 'Incorrect username',
           });
         }
         if (user.password !== password) {
@@ -26,8 +26,8 @@ const strategy = new BasicStrategy(
         }
         return cb(null, user);
       })
-      .catch(err => cb(err))
-});
+      .catch(err => cb(err));
+  });
 
 passport.use(strategy);
 
@@ -126,10 +126,8 @@ const basicStrategy = new BasicStrategy(function(username, password, callback) {
     .then(isValid => {
       if (!isValid) {
         return callback(null, false, {message: 'Incorrect password'});
-      }
-      else {
-        return callback(null, user)
-      }
+      }  
+      return callback(null, user)
     });
 });
 
@@ -138,7 +136,7 @@ passport.use(basicStrategy);
 router.use(passport.initialize());
 
 // what's up with the /me?
-router.get('/api/me',
+router.get('/me',
   passport.authenticate('basic', {session: false}),
   (req, res) => res.json({user: req.user.apiRepr()})
 );

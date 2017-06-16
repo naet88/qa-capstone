@@ -1,19 +1,21 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const mongoose = require('mongoose');
-//is this even right...
-const {router: usersRouter} = require('./users/router');
+const usersRouter = require('./users/router');
 
 mongoose.Promise = global.Promise;
 
-const {PORT, DATABASE_URL} = require('./config');
-const {Question} = require('./models/question');
-const {User} = require('./models/user');
+const { PORT, DATABASE_URL } = require('./config');
+const { Question } = require('./models/question');
 
 const app = express();
 
-function serveIndex (req, res) {
-  res.sendFile(__dirname + '/static/index.html'); 
+function serveIndex(req, res) {
+  res.sendFile(__dirname + '/static/index.html');
+}
+
+function serveSignup(req, res) {
+  res.sendFile(__dirname + '/static/signup.html');
 }
 
 app.get('/', serveIndex);
@@ -22,56 +24,17 @@ app.get('/ask-question', serveIndex);
 
 app.get('/question', serveIndex);
 
+app.get('/signup', serveSignup);
+
 app.use(express.static('static'));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-//is this even right...
-app.use('/users/', usersRouter);
+
+//path to request 
+app.use('/', usersRouter.router);
 
 // Begin CRUD operations - QUESTIONS
-
-// app.get('/api/users', (req, res) => {
-//   User
-//     .find()
-//     .exec()
-//     .then(users => {
-//       res.json({
-//         users: users.map(user => {return user.apiRepr();})
-//       })
-//     })
-
-//     .catch(
-//       err => {
-//         console.error(err);
-//         return res.status(500).json({message: 'Internal server error'});
-//       });
-// });
-
-// //bcrypt.hash("B4c0/\/", salt, function(err, hash) {
-//         // Store hash in your password DB.
-//     // });
-//     //https://github.com/dcodeIO/bcrypt.js#hashs-salt-callback-progresscallback
-
-// app.post('/api/users', (req, res) => {
-//   User
-//     .create({
-//       firstName: req.body.firstname,
-//       lastName: req.body.lastname,
-//       username: req.body.username,
-//       password: 
-//     })
-//     .then(newUser => {
-//       res.json({
-//         user: newUser.apiRepr()
-//       })
-//     })
-//     .catch(
-//       err => {
-//         console.error(err);
-//         return res.status(500).json({message: 'Internal server error'});
-//       });
-// });
 
 app.get('/api/questions', (req, res) => {
   Question
