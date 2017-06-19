@@ -14,9 +14,9 @@ function serveIndex(req, res) {
   res.sendFile(__dirname + '/static/index.html');
 }
 
-function serveSignup(req, res) {
-  res.sendFile(__dirname + '/static/signup.html');
-}
+// function serveSignup(req, res) {
+//   res.sendFile(__dirname + '/static/signup.html');
+// }
 
 app.get('/', serveIndex);
 
@@ -24,7 +24,11 @@ app.get('/ask-question', serveIndex);
 
 app.get('/question', serveIndex);
 
-app.get('/signup', serveSignup);
+app.get('/signup', serveIndex);
+
+app.get('/login', serveIndex);
+
+// app.get('/signup', serveSignup);
 
 app.use(express.static('static'));
 

@@ -84,7 +84,7 @@ function userLogin(user, callback) {
   });
 }
 
-// USER CREATION: Also very precarious and very possibly incorrect. 
+// USER CREATION: Also very precarious and very possibly incorrect.
 function createUser(newUser, callback) {
   $.ajax({
     type: 'POST',
@@ -97,12 +97,20 @@ function createUser(newUser, callback) {
 
 // RENDER IN THE DOM
 
+function loginRender(state, element) {
+  $('form#register-form').show();
+  $('form#login-form').hide();
+}
+
+function signupRender(state, element) {
+  $('form#register-form').hide();
+  $('form#login-form').show();
+}
+
 function quesRender(state, element) {
   $(element).find('.js-main-page').hide();
   $(element).find('.js-question-page').hide();
   $(element).find('.js-question-display-page').show();
-  $(element).find('.js-answerQuestion').hide();
-  $(element).find('.js-answerDisplay').hide();
 
   $(element).find('.js-questionTitle').text(state.quesDisplayPage.question.questionTitle);
   $(element).find('.js-questionDetail').text(state.quesDisplayPage.question.questionDetail);
@@ -130,6 +138,7 @@ function homepageRender(state, element) {
   $(element).find('.js-question-page').hide();
   $(element).find('.js-answerQuestion').hide();
   $(element).find('.js-answerDisplay').hide();
+  $(element).find('.js-panel-login').hide();
 
   var cappedQuestions = Math.min(state.homePage.questions.length, 10);
 
@@ -180,6 +189,10 @@ function handlePage(state, element) {
     getAllQues(getAllQuesCallback);
   } else if (currentUrl === 'http://localhost:8080/ask-question') {
     askQuesRender(state, element);
+  } else if (currentUrl === 'http://localhost:8080/login') {
+    loginRender(state, element);
+  } else if (currentUrl === 'http://localhost:8080/signup') {
+    signupRender(state, element);
   } else if (window.location.href.match(new RegExp('^http://localhost:8080/question'))) {
     function quesQuesCallback(ques) {
       storeQues(ques);
@@ -241,13 +254,18 @@ $('form#answerQuestion').on('submit', function (event) {
 });
 
 $('.js-signup').on('click', function (event) {
-  console.log(event);
-  $('form#login-form').hide();
+  event.preventDefault();
+  history.pushState({}, 'http://localhost:8080/signup');
+  handlePage(state, $('main'));
+  
 });
 
 $('.js-login').on('click', function (event) {
-  console.log(event);
+  event.preventDefault();
+  history.pushState({}, 'http://localhost:8080/login');
+  handlePage(state, $('main'));
   $('form#register-form').hide();
+  $('form#login-form').show();
 });
 
 $('form#login-form').on('submit', function (event) {
