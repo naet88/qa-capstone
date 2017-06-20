@@ -14,10 +14,6 @@ function serveIndex(req, res) {
   res.sendFile(__dirname + '/static/index.html');
 }
 
-// function serveSignup(req, res) {
-//   res.sendFile(__dirname + '/static/signup.html');
-// }
-
 app.get('/', serveIndex);
 
 app.get('/ask-question', serveIndex);
@@ -28,14 +24,13 @@ app.get('/signup', serveIndex);
 
 app.get('/login', serveIndex);
 
-// app.get('/signup', serveSignup);
 
 app.use(express.static('static'));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-//path to request 
+// path to request
 app.use('/', usersRouter.router);
 
 // Begin CRUD operations - QUESTIONS
@@ -46,78 +41,76 @@ app.get('/api/questions', (req, res) => {
     .exec()
     .then(questions => {
       res.json({
-        questions: questions.map(question => {return question.apiRepr();})
-      })
+        questions: questions.map(question => { return question.apiRepr(); }),
+      });
     })
 
     .catch(
       err => {
         console.error(err);
-        return res.status(500).json({message: 'Internal server error'});
+        return res.status(500).json({ message: 'Internal server error' });
       });
 });
 
 app.get('/api/questions/:id', (req, res) => {
-  Question 
+  Question
     .findById(req.params.id)
     .exec()
     .then(questions => {
       res.json({
-        question: questions.apiRepr()
+        question: questions.apiRepr(),
       });
     })
     .catch(
       err => {
         console.error(err);
-        return res.status(500).json({message: 'Internal server error'});
+        return res.status(500).json({ message: 'Internal server error' });
       });
-}); 
+});
 
 app.post('/api/questions', (req, res) => {
-  //check required fields 
   const requiredFields = ['questionTitle', 'username', 'questionDetail'];
   for (let i = 0; i < requiredFields.length; i++) {
     const field = requiredFields[i];
     if (!(field in req.body)) {
-      const errorMessage = `Missing \`${field}\` in request body`
+      const errorMessage = `Missing \`${field}\` in request body`;
       console.error(errorMessage);
       return res.status(400).send(errorMessage);
     }
   }
-  //if required fields are there, this executes:
-  Question 
+
+  Question
     .create({
       questionTitle: req.body.questionTitle,
       username: req.body.username,
-      questionDetail: req.body.questionDetail
+      questionDetail: req.body.questionDetail,
     })
     .then(newQuestion => {
       res.json({
-        question: newQuestion.apiRepr()
-      })
+        question: newQuestion.apiRepr(),
+      });
     })
     .catch(
       err => {
         console.error(err);
-        return res.status(500).json({message: 'Internal server error'});
+        return res.status(500).json({ message: 'Internal server error' });
       });
 });
 
 app.put('/api/questions/:id', (req, res) => {
-  //assuming ids match for now
-  //force minimum word count  
+  // assuming ids match for now
+  // force minimum word count
   const userAnswer = req.body.answers;
-  // console.log('this is the answer: ', userAnswer);
   Question
-    .findByIdAndUpdate(req.params.id, {$push: {answers: userAnswer}}, {'new': true})
+    .findByIdAndUpdate(req.params.id, { $push: { answers: userAnswer } }, { 'new': true })
     .then(questions => {
-     const question = questions.apiRepr()
-     res.json({question})
+      const question = questions.apiRepr();
+      res.json({ question });
     })
     .catch(
       err => {
         console.error(err);
-        return res.status(500).json({message: 'Internal server error'});
+        return res.status(500).json({ message: 'Internal server error' });
       });
 });
 
@@ -126,8 +119,7 @@ app.put('/api/questions/:id', (req, res) => {
 let server;
 
 // connects to database, then starts server
-function runServer (databaseUrl = DATABASE_URL, port = PORT) {
-
+function runServer(databaseUrl = DATABASE_URL, port = PORT) {
   return new Promise((resolve, reject) => {
     mongoose.connect(databaseUrl, err => {
       if (err) {
@@ -162,7 +154,7 @@ function closeServer() {
 
 if (require.main === module) {
   runServer().catch(err => console.error(err));
-};
+}
 
-//need this so that other files can have access to this. 
-module.exports = {runServer, closeServer};
+// need this so that other files can have access to this.
+module.exports = { runServer, closeServer };

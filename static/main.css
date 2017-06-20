@@ -59,3 +59,11 @@ a {
 	margin-left: 100px;
 	margin-right: 100px;
 }
+
+/*.js-container {
+	display: none;
+}*/
+
+.js-password-active {
+	display: none;
+}

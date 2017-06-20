@@ -21,6 +21,9 @@ var state = {
   },
   homePage: {
     questions: []
+  },
+  userData: {
+    username: ''
   }
 };
 
@@ -28,12 +31,10 @@ var state = {
 
 function storeQues(quesObject) {
   state.quesDisplayPage.question = quesObject.question;
-  // console.log('This is the updated state: ', state.quesDisplayPage.question);
 }
 
 function storeAllQues(quesObject) {
   state.homePage.questions = quesObject.questions;
-  // console.log('this is state.homePage', state.homePage);
 }
 
 function postQues(question, callback) {
@@ -98,25 +99,52 @@ function createUser(newUser, callback) {
 // RENDER IN THE DOM
 
 function loginRender(state, element) {
-  $('form#register-form').show();
-  $('form#login-form').hide();
+  $(element).find('.js-login-page').show();
+  $(element).find('.js-main-page').hide();
+  $(element).find('.js-question-display-page').hide();
+  $(element).find('.js-question-page').hide();
+  $(element).find('.js-answerQuestion').hide();
+  $(element).find('.js-answerDisplay').hide();
+  $(element).find('.js-signup-page').hide();
+  $(element).find('.js-signup-success').hide();
 }
 
 function signupRender(state, element) {
-  $('form#register-form').hide();
-  $('form#login-form').show();
+  $(element).find('.js-signup-page').show();
+  $(element).find('.js-main-page').hide();
+  $(element).find('.js-question-display-page').hide();
+  $(element).find('.js-question-page').hide();
+  $(element).find('.js-answerQuestion').hide();
+  $(element).find('.js-answerDisplay').hide();
+  $(element).find('.js-login-page').hide();
+  $(element).find('.js-signup-success').hide();
+  // $('.js-container').hide();
+}
+
+function successRender(state, element) {
+  $(element).find('.js-signup-page').hide();
+  $(element).find('.js-main-page').hide();
+  $(element).find('.js-question-display-page').hide();
+  $(element).find('.js-question-page').hide();
+  $(element).find('.js-answerQuestion').hide();
+  $(element).find('.js-answerDisplay').hide();
+  $(element).find('.js-login-page').hide();
+  $(element).find('.js-signup-success').show();
 }
 
 function quesRender(state, element) {
   $(element).find('.js-main-page').hide();
   $(element).find('.js-question-page').hide();
+  $(element).find('.js-login-page').hide();
+  $(element).find('.js-signup-page').hide();
   $(element).find('.js-question-display-page').show();
+  $(element).find('.js-signup-success').hide();
 
   $(element).find('.js-questionTitle').text(state.quesDisplayPage.question.questionTitle);
   $(element).find('.js-questionDetail').text(state.quesDisplayPage.question.questionDetail);
 
   // works if there are answers
-  // appending is the issue 
+  // appending is the issue
   if (state.quesDisplayPage.question.answers.length > 0) {
     $(element).find('.js-answerDisplay').show();
 
@@ -138,12 +166,13 @@ function homepageRender(state, element) {
   $(element).find('.js-question-page').hide();
   $(element).find('.js-answerQuestion').hide();
   $(element).find('.js-answerDisplay').hide();
-  $(element).find('.js-panel-login').hide();
+  $(element).find('.js-login-page').hide();
+  $(element).find('.js-signup-page').hide();
+  $(element).find('.js-signup-success').hide();
 
   var cappedQuestions = Math.min(state.homePage.questions.length, 10);
 
   // I want to order by the highest number of likes first.
-  // Also, I don't think hardcoding href=localhost is a good idea.
   // Lodash?
   // Best Practice: Server-side. Limit 10 and sort
   for (var i = 0; i < cappedQuestions; i++) {
@@ -152,7 +181,7 @@ function homepageRender(state, element) {
     var quesID = state.homePage.questions[i].id;
     $(element).find('.js-question-table').append("<tbody>\
       <tr>\
-      <td><a href='http://localhost:8080/question?" + quesID + "'>"
+      <td><a href='" + appUrl('/question?') + quesID + "'>"
       + quesTitle + "</a>\
       </td>\
       <td>"
@@ -166,6 +195,9 @@ function answerRender(state, element) {
   $(element).find('button.js-answer-button').hide();
   $(element).find('.js-answerQuestion').show();
   $(element).find('.js-answerDisplay').hide();
+  $(element).find('.js-login-page').hide();
+  $(element).find('.js-signup-page').hide();
+  $(element).find('.js-signup-success').hide();
 }
 
 function askQuesRender(state, element) {
@@ -174,6 +206,9 @@ function askQuesRender(state, element) {
   $(element).find('.js-question-display-page').hide();
   $(element).find('.js-answerQuestion').hide();
   $(element).find('.js-answerDisplay').hide();
+  $(element).find('.js-login-page').hide();
+  $(element).find('.js-signup-page').hide();
+  $(element).find('.js-signup-success').hide();
 }
 
 // STEP 4: JQUERY EVENT LISTENERS
@@ -181,19 +216,21 @@ function askQuesRender(state, element) {
 function handlePage(state, element) {
   var currentUrl = window.location.href;
 
-  if (currentUrl === 'http://localhost:8080/') {
+  if (currentUrl === appUrl('/')) {
     function getAllQuesCallback(allQues) {
       storeAllQues(allQues);
       homepageRender(state, element);
     }
     getAllQues(getAllQuesCallback);
-  } else if (currentUrl === 'http://localhost:8080/ask-question') {
+  } else if (currentUrl === appUrl('/ask-question')) {
     askQuesRender(state, element);
-  } else if (currentUrl === 'http://localhost:8080/login') {
+  } else if (currentUrl === appUrl('/login')) {
     loginRender(state, element);
-  } else if (currentUrl === 'http://localhost:8080/signup') {
+  } else if (currentUrl === appUrl('/signup')) {
     signupRender(state, element);
-  } else if (window.location.href.match(new RegExp('^http://localhost:8080/question'))) {
+  } else if (currentUrl === appUrl('/signup-success')) {
+    successRender(state, element);
+  } else if (window.location.href.match(new RegExp('^' + appUrl('/question')))) {
     function quesQuesCallback(ques) {
       storeQues(ques);
       quesRender(state, element);
@@ -255,17 +292,14 @@ $('form#answerQuestion').on('submit', function (event) {
 
 $('.js-signup').on('click', function (event) {
   event.preventDefault();
-  history.pushState({}, 'http://localhost:8080/signup');
+  history.pushState({}, '', appUrl('/signup'));
   handlePage(state, $('main'));
-  
 });
 
 $('.js-login').on('click', function (event) {
   event.preventDefault();
-  history.pushState({}, 'http://localhost:8080/login');
+  history.pushState({}, '', appUrl('/login'));
   handlePage(state, $('main'));
-  $('form#register-form').hide();
-  $('form#login-form').show();
 });
 
 $('form#login-form').on('submit', function (event) {
@@ -275,30 +309,41 @@ $('form#login-form').on('submit', function (event) {
 
 $('form#register-form').on('submit', function (event) {
   event.preventDefault();
-  
   var username = $('#username').val();
   var password = $('#password').val();
   var passwordConfirm = $('#confirm-password').val();
+  var firstName = $('#firstname').val();
+  var lastName = $('#lastname').val();
 
+  // Low priority: how to do this on client-side?
   if (password !== passwordConfirm) {
-    //show the DOM element for passwords  not matching 
+    $('.js-password-active').show();
+    // prevent form submission
   }
 
-  var data = {
+  var user = {
     username: username,
-    password: password //needs to be hashed?
+    // password: password,
+    firstName: firstName,
+    lastName: lastName
   };
 
-  createUser(data, function(object) {
+  createUser(user, function (object) {
     console.log(object);
+    // state should be updated w/ username 
   });
+
+  function createUserCallback(state, object) {
+    history.pushState({}, '', appUrl('/signup-success'));
+    handlePage(state, $('main'));
+  }
 });
 
 // UTILITY FUNCTIONS
 
 function pushState() {
   var qId = state.quesDisplayPage.question.id;
-  var url = 'http://localhost:8080/question?' + qId;
+  var url = appUrl('/question?') + qId;
   history.pushState({}, '', url);
   handlePage(state, $('main'));
 }
