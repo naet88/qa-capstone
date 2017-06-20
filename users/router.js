@@ -43,6 +43,8 @@ router.post('/api/users', (req, res) => {
 
   let { username, password, firstName, lastName } = req.body;
 
+  console.log(req.body);
+  
   if (typeof username !== 'string') {
     return res.status(422).json({ message: 'Incorrect field type: username' });
   }
@@ -86,7 +88,7 @@ router.post('/api/users', (req, res) => {
       return User
         .create({
           username: username,
-          // password: hash,
+          password: hash,
           firstName: firstName,
           lastName: lastName,
         });

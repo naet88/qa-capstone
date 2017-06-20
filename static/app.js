@@ -323,7 +323,7 @@ $('form#register-form').on('submit', function (event) {
 
   var user = {
     username: username,
-    // password: password,
+    password: password,
     firstName: firstName,
     lastName: lastName
   };
