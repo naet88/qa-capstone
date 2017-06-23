@@ -107,6 +107,7 @@ function loginRender(state, element) {
   $(element).find('.js-answerDisplay').hide();
   $(element).find('.js-signup-page').hide();
   $(element).find('.js-signup-success').hide();
+  $(element).find('.js-answerQuestion').hide();
 }
 
 function signupRender(state, element) {
@@ -118,6 +119,7 @@ function signupRender(state, element) {
   $(element).find('.js-answerDisplay').hide();
   $(element).find('.js-login-page').hide();
   $(element).find('.js-signup-success').hide();
+  $(element).find('.js-answerQuestion').hide();
   // $('.js-container').hide();
 }
 
@@ -130,6 +132,7 @@ function successRender(state, element) {
   $(element).find('.js-answerDisplay').hide();
   $(element).find('.js-login-page').hide();
   $(element).find('.js-signup-success').show();
+  $(element).find('.js-answerQuestion').hide();
 }
 
 function quesRender(state, element) {
@@ -139,6 +142,7 @@ function quesRender(state, element) {
   $(element).find('.js-signup-page').hide();
   $(element).find('.js-question-display-page').show();
   $(element).find('.js-signup-success').hide();
+  $(element).find('.js-answerQuestion').hide();
 
   $(element).find('.js-questionTitle').text(state.quesDisplayPage.question.questionTitle);
   $(element).find('.js-questionDetail').text(state.quesDisplayPage.question.questionDetail);
@@ -169,6 +173,7 @@ function homepageRender(state, element) {
   $(element).find('.js-login-page').hide();
   $(element).find('.js-signup-page').hide();
   $(element).find('.js-signup-success').hide();
+  $(element).find('.js-answerQuestion').hide();
 
   var cappedQuestions = Math.min(state.homePage.questions.length, 10);
 
@@ -209,6 +214,7 @@ function askQuesRender(state, element) {
   $(element).find('.js-login-page').hide();
   $(element).find('.js-signup-page').hide();
   $(element).find('.js-signup-success').hide();
+
 }
 
 // STEP 4: JQUERY EVENT LISTENERS
@@ -309,11 +315,11 @@ $('form#login-form').on('submit', function (event) {
 
 $('form#register-form').on('submit', function (event) {
   event.preventDefault();
-  var username = $('#username').val();
-  var password = $('#password').val();
-  var passwordConfirm = $('#confirm-password').val();
-  var firstName = $('#firstname').val();
-  var lastName = $('#lastname').val();
+  var username = $('.register-user #username').val();
+  var password = $('.register-user #password').val();
+  var passwordConfirm = $('.register-user #confirm-password').val();
+  var firstName = $('.register-user #firstname').val();
+  var lastName = $('.register-user #lastname').val();
 
   // Low priority: how to do this on client-side?
   if (password !== passwordConfirm) {
@@ -328,16 +334,24 @@ $('form#register-form').on('submit', function (event) {
     lastName: lastName
   };
 
-  createUser(user, function (object) {
-    console.log(object);
-    // state should be updated w/ username 
-  });
-
   function createUserCallback(state, object) {
     history.pushState({}, '', appUrl('/signup-success'));
     handlePage(state, $('main'));
   }
+
+  createUser(user, createUserCallback);
+    // state should be updated w/ username 
 });
+
+// $('button.js-askQues').on('click', function (event) {
+//   // if user auth, then: http://localhost:8080/ask-question
+//   // if not, login/signup page  
+// }
+
+// $('button.js-answer-button').on('click', function (event) {
+//   // if user auth, then show ask ques form
+//   // if not, login/signup page  
+// }
 
 // UTILITY FUNCTIONS
 
